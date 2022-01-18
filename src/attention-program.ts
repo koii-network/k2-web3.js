@@ -493,18 +493,18 @@ export class AttentionProgram {
   static SubmitPorts(params: any): Transaction {
     const {
       stakePubkey,
-      authorizedPubkey,
-      newAuthorizedPubkey
+      accountDataPubkey
     } = params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitPorts;
     const data = encodeData(type, {
-      account: toBuffer(newAuthorizedPubkey.toBuffer())
+      account: toBuffer(accountDataPubkey.toBuffer())
     });
 
     const keys = [
       {pubkey: stakePubkey, isSigner: false, isWritable: true},
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
-      {pubkey: authorizedPubkey, isSigner: true, isWritable: false},
+      {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
+
     ];
     console.log('KEYS',keys);
     // if (custodianPubkey) {
