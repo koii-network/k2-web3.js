@@ -492,7 +492,7 @@ export class AttentionProgram {
    */
   static SubmitPorts(params: any): Transaction {
     const {
-      stakePubkey,
+      attentionPubkey,
       accountDataPubkey
     } = params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitPorts;
@@ -501,7 +501,7 @@ export class AttentionProgram {
     });
 
     const keys = [
-      {pubkey: stakePubkey, isSigner: false, isWritable: true},
+      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
       {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
 
