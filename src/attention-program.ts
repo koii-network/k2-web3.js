@@ -550,7 +550,7 @@ export class AttentionProgram {
         fromPubkey: params.fromPubkey,
         newAccountPubkey: params.stakePubkey,
         lamports: params.lamports,
-        space: this.space,
+        space: params.space,
         programId: this.programId,
       }),
     );
