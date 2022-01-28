@@ -431,6 +431,7 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
       BufferLayout.u32('instruction'),
       Layout.rustString(),
       Layout.uint64(),
+      Layout.publicKey('newAuthorized')
     ]),
   },
   SubmitPorts: {
@@ -505,6 +506,36 @@ export class AttentionProgram {
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
       {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
 
+    ];
+    console.log('KEYS',keys);
+    // if (custodianPubkey) {
+    //   keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
+    // }
+    return new Transaction().add({
+      keys,
+      programId: this.programId,
+      data,
+    });
+  }
+  /**
+   * Generate an Initialize instruction to add to a Stake Create transaction
+   */
+   static RegisterRecipient(params: any): Transaction {
+    const {
+      attentionPubkey,
+      nftPubKeyStr,
+      ownerPubKey
+    } = params;
+    const type = ATTENTION_INSTRUCTION_LAYOUTS.RegisterRecipient;
+    const data = encodeData(type, {
+      recipient: nftPubKeyStr,
+      shares:1,
+      owner: toBuffer(ownerPubKey.toBuffer())
+    });
+
+    const keys = [
+      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
+      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
     ];
     console.log('KEYS',keys);
     // if (custodianPubkey) {
