@@ -429,8 +429,8 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
     index: 0,
     layout: BufferLayout.struct([
       BufferLayout.u32('instruction'),
-      Layout.rustString("recipient"),
-      BufferLayout.ns64("shares"),
+      // Layout.rustString("recipient"),
+      // BufferLayout.ns64("shares"),
       Layout.publicKey('owner')
     ]),
   },
@@ -524,18 +524,20 @@ export class AttentionProgram {
     const {
       attentionPubkey,
       nftPubKeyStr,
-      ownerPubKey
+      ownerPubKey,
+      accountDataPubkey
     } = params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.RegisterRecipient;
     const data = encodeData(type, {
-      recipient: nftPubKeyStr,
-      shares:100000,
+      // recipient: nftPubKeyStr,
+      // shares:100000,
       owner: toBuffer(ownerPubKey.toBuffer())
     });
 
     const keys = [
       {pubkey: attentionPubkey, isSigner: false, isWritable: true},
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
+      {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
     ];
     console.log('KEYS',keys);
     // if (custodianPubkey) {
