@@ -429,9 +429,9 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
     index: 0,
     layout: BufferLayout.struct([
       BufferLayout.u32('instruction'),
-      Layout.rustString(),
-      Layout.uint64(),
-      Layout.publicKey('newAuthorized')
+      Layout.rustString("recipient"),
+      BufferLayout.ns64("shares"),
+      Layout.publicKey('owner')
     ]),
   },
   SubmitPorts: {
@@ -529,7 +529,7 @@ export class AttentionProgram {
     const type = ATTENTION_INSTRUCTION_LAYOUTS.RegisterRecipient;
     const data = encodeData(type, {
       recipient: nftPubKeyStr,
-      shares:1,
+      shares:100000,
       owner: toBuffer(ownerPubKey.toBuffer())
     });
 
