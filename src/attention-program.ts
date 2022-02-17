@@ -123,7 +123,7 @@ export class AttentionProgram {
 
     const keys = [
       {pubkey: attentionPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
+      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
       {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
     ];
     console.log('KEYS',keys);
