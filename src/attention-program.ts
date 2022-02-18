@@ -1,16 +1,14 @@
 import * as BufferLayout from '@solana/buffer-layout';
 
-import {encodeData, decodeData, InstructionType} from './instruction';
+import { encodeData} from './instruction';
 import * as Layout from './layout';
-import {PublicKey} from './publickey';
-import {SystemProgram} from './system-program';
+import { PublicKey } from './publickey';
+import { SystemProgram } from './system-program';
 import {
   SYSVAR_CLOCK_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  SYSVAR_STAKE_HISTORY_PUBKEY,
 } from './sysvar';
-import {Transaction, TransactionInstruction} from './transaction';
-import {toBuffer} from './util/to-buffer';
+import { Transaction } from './transaction';
+import { toBuffer } from './util/to-buffer';
 
 /**
  * Address of the stake config account which configures the rate
@@ -57,7 +55,7 @@ export class AttentionProgram {
   /**
    * @internal
    */
-  constructor() {}
+  constructor() { }
 
   /**
    * Public key that identifies the Stake program
@@ -89,12 +87,12 @@ export class AttentionProgram {
     });
 
     const keys = [
-      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
-      {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
+      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+      { pubkey: accountDataPubkey, isSigner: false, isWritable: false },
 
     ];
-    console.log('KEYS',keys);
+    console.log('KEYS', keys);
     // if (custodianPubkey) {
     //   keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
     // }
@@ -107,7 +105,7 @@ export class AttentionProgram {
   /**
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
-   static RegisterRecipient(params: any): Transaction {
+  static RegisterRecipient(params: any): Transaction {
     const {
       attentionPubkey,
       nftPubKeyStr,
@@ -122,11 +120,11 @@ export class AttentionProgram {
     });
 
     const keys = [
-      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
-      {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
+      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: accountDataPubkey, isSigner: false, isWritable: false },
     ];
-    console.log('KEYS',keys);
+    console.log('KEYS', keys);
     // if (custodianPubkey) {
     //   keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
     // }
