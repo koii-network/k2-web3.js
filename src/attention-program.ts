@@ -1,4 +1,5 @@
 import * as BufferLayout from '@solana/buffer-layout';
+import { boolean } from 'superstruct';
 
 import {encodeData} from './instruction';
 import * as Layout from './layout';
@@ -42,6 +43,7 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
       Layout.publicKey('newAuthorized'),
     ]),
   },
+  //FIXME: FIx Indexes of layouts
   Withdraw: {
     index: 2,
     layout: BufferLayout.struct([
@@ -56,6 +58,13 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
       BufferLayout.ns64('lamports'),
     ]),
   },
+  Voting:{
+    index: 2,
+    layout: BufferLayout.struct([
+      BufferLayout.u32('instruction'),
+      BufferLayout.ns64("is_valid")
+    ]),
+  }
 });
 type WithdrawStakeParams = {
   stakePubkey: PublicKey;
@@ -199,6 +208,35 @@ export class AttentionProgram {
       data,
     });
   }
+  /**
+   * Generate an Initialize instruction to add to a Stake Create transaction
+   */
+ static Voting(params: any): Transaction {
+  const {
+    attentionPubkey,
+    accountDataPubkey,
+    isValid
+  } = params;
+  const type = ATTENTION_INSTRUCTION_LAYOUTS.Voting;
+  const data = encodeData(type, {
+    is_valid: isValid?1:0 
+  });
+
+  const keys = [
+    { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+    { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+    { pubkey: accountDataPubkey, isSigner: false, isWritable: true },
+  ];
+  console.log('KEYS', keys);
+  // if (custodianPubkey) {
+  //   keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
+  // }
+  return new Transaction().add({
+    keys,
+    programId: this.programId,
+    data,
+  });
+}
   /**
    * Generate a Transaction that creates a new Attention account
    */
