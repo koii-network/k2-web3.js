@@ -43,28 +43,27 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
       Layout.publicKey('newAuthorized'),
     ]),
   },
-  //FIXME: FIx Indexes of layouts
-  Withdraw: {
-    index: 2,
-    layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
-      BufferLayout.ns64('lamports'),
-    ]),
-  },
-  AddFunds: {
-    index: 3,
-    layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
-      BufferLayout.ns64('lamports'),
-    ]),
-  },
   Voting:{
     index: 2,
     layout: BufferLayout.struct([
       BufferLayout.u32('instruction'),
       BufferLayout.ns64("is_valid")
     ]),
-  }
+  },
+  Withdraw: {
+    index: 3,
+    layout: BufferLayout.struct([
+      BufferLayout.u32('instruction'),
+      BufferLayout.ns64('lamports'),
+    ]),
+  },
+  AddFunds: {
+    index: 4,
+    layout: BufferLayout.struct([
+      BufferLayout.u32('instruction'),
+      BufferLayout.ns64('lamports'),
+    ]),
+  },
 });
 type WithdrawStakeParams = {
   stakePubkey: PublicKey;
