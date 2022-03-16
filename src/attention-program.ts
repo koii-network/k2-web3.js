@@ -123,13 +123,11 @@ export class AttentionProgram {
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
   static RegisterRecipient(params: any): Transaction {
-    const {attentionPubkey, nftPubKeyStr, ownerPubKey, accountDataPubkey} =
+    const {attentionPubkey, accountDataPubkey} =
       params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.RegisterRecipient;
     const data = encodeData(type, {
-      // recipient: nftPubKeyStr,
-      // shares:100000,
-      owner: toBuffer(ownerPubKey.toBuffer()),
+      owner: toBuffer(accountDataPubkey.toBuffer()),
     });
 
     const keys = [
