@@ -113,10 +113,6 @@ export class AttentionProgram {
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
       {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
     ];
-    console.log('KEYS', keys);
-    // if (custodianPubkey) {
-    //   keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
-    // }
     return new Transaction().add({
       keys,
       programId: this.programId,
@@ -141,10 +137,6 @@ export class AttentionProgram {
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
       {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
     ];
-    console.log('KEYS', keys);
-    // if (custodianPubkey) {
-    //   keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
-    // }
     return new Transaction().add({
       keys,
       programId: this.programId,
