@@ -225,7 +225,7 @@ export class AttentionProgram {
     transaction.add(
       SystemProgram.createAccount({
         fromPubkey: params.fromPubkey,
-        newAccountPubkey: params.stakePubkey,
+        newAccountPubkey: params.attentionPubkey,
         lamports: params.lamports,
         space: params.space,
         programId: this.programId,
