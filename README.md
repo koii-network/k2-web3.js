@@ -48,7 +48,7 @@ console.log(koiiWeb3);
 ### Browser bundle
 
 ```js
-// `solanaWeb3` is provided in the global namespace by the `koiiWeb3.min.js` script bundle.
+// `koiiWeb3` is provided in the global namespace by the `koiiWeb3.min.js` script bundle.
 console.log(koiiWeb3);
 ```
 
