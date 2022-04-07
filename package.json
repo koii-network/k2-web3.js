@@ -1,20 +1,20 @@
 {
-  "name": "@solana/web3.js",
-  "version": "0.0.0-development",
-  "description": "Solana Javascript API",
+  "name": "@_koi/web3.js",
+  "version": "0.0.1",
+  "description": "KOII (K2) Javascript API",
   "keywords": [
     "api",
     "blockchain"
   ],
   "license": "MIT",
-  "author": "Solana Maintainers <maintainers@solana.com>",
-  "homepage": "https://solana.com/",
+  "author": "Koii Network",
+  "homepage": "https://github.com/koii-network/k2-web3.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/solana-labs/solana-web3.js.git"
+    "url": "https://github.com/koii-network/k2-web3.js.git"
   },
   "bugs": {
-    "url": "http://github.com/solana-labs/solana-web3.js.git/issues"
+    "url": "https://github.com/koii-network/k2-web3.js/issues"
   },
   "publishConfig": {
     "access": "public"
