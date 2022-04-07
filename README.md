@@ -1,27 +1,7 @@
-[![Build status][travis-image]][travis-url]
-[![codecov][codecov-image]][codecov-url]
-<br>
-[![npm][npm-image]][npm-url]
-[![npm-downloads][npm-downloads-image]][npm-url]
-<br>
-[![semantic-release][semantic-release-image]][semantic-release-url]
-[![code-style-prettier][code-style-prettier-image]][code-style-prettier-url]
 
-[travis-image]: https://api.travis-ci.org/solana-labs/solana-web3.js.svg?branch=master
-[travis-url]: https://travis-ci.org/solana-labs/solana-web3.js
-[codecov-image]: https://codecov.io/gh/solana-labs/solana-web3.js/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/solana-labs/solana-web3.js
-[npm-image]: https://img.shields.io/npm/v/@solana/web3.js.svg?style=flat
-[npm-downloads-image]: https://img.shields.io/npm/dm/@solana/web3.js.svg?style=flat
-[npm-url]: https://www.npmjs.com/package/@solana/web3.js
-[semantic-release-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg
-[semantic-release-url]: https://github.com/semantic-release/semantic-release
-[code-style-prettier-image]: https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square
-[code-style-prettier-url]: https://github.com/prettier/prettier
+# KOII (K2) JavaScript API
 
-# Solana JavaScript API
-
-This is the Solana Javascript API built on the Solana [JSON RPC API](https://docs.solana.com/apps/jsonrpc-api)
+This is the KOII (K2) Javascript API built on the KOII [JSON RPC API](https://docs.solana.com/apps/jsonrpc-api)
 
 [Latest API Documentation](https://solana-labs.github.io/solana-web3.js/)
 
@@ -30,96 +10,60 @@ This is the Solana Javascript API built on the Solana [JSON RPC API](https://doc
 ### Yarn
 
 ```
-$ yarn add @solana/web3.js
+$ yarn add @_koi/web3.js
 ```
 
 ### npm
 
 ```
-$ npm install --save @solana/web3.js
+$ npm install --save @_koi/web3.js
 ```
 
 ### Browser bundle
 
 ```html
 <!-- Development (un-minified) -->
-<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.js"></script>
+<script src="https://unpkg.com/@_koi/web3.js@latest/lib/index.iife.js"></script>
 
 <!-- Production (minified) -->
-<script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+<script src="https://unpkg.com/@_koi/web3.js@latest/lib/index.iife.min.js"></script>
 ```
-
-## Development Environment Setup
-
-Install the latest Solana release from https://docs.solana.com/cli/install-solana-cli-tools
-
-### Run test validator
-
-**Use `solana-test-validator` from the latest Solana release**
-
-### BPF program development
-
-**Use `cargo build-bpf` from the latest Solana release**
 
 ## Usage
 
 ### Javascript
 
 ```js
-const solanaWeb3 = require('@solana/web3.js');
-console.log(solanaWeb3);
+const koiiWeb3 = require('@_koi/web3.js');
+console.log(koiiWeb3);
 ```
 
 ### ES6
 
 ```js
-import * as solanaWeb3 from '@solana/web3.js';
-console.log(solanaWeb3);
+import * as koiiWeb3 from '@_koi/web3.js';
+console.log(koiiWeb3);
 ```
 
 ### Browser bundle
 
 ```js
-// `solanaWeb3` is provided in the global namespace by the `solanaWeb3.min.js` script bundle.
-console.log(solanaWeb3);
+// `solanaWeb3` is provided in the global namespace by the `koiiWeb3.min.js` script bundle.
+console.log(koiiWeb3);
 ```
 
 ## Examples
 
 Example scripts for the web3.js repo and native programs:
 
-- [Web3 Examples](https://github.com/solana-labs/solana/tree/master/web3.js/examples)
+- [Web3 Examples](https://github.com/koii-network/k2-web3.js/tree/master/examples)
 
-Example scripts for the Solana Program Library:
-
-- [Token Program Examples](https://github.com/solana-labs/solana-program-library/tree/master/token/js/examples)
-
-## Flow
-
-A [Flow library definition](https://flow.org/en/docs/libdefs/) is provided at
-https://unpkg.com/@solana/web3.js@latest/module.flow.js.
-Download the file and add the following line under the [libs] section of your project's `.flowconfig` to
-activate it:
-
-```ini
-[libs]
-node_modules/@solana/web3.js/module.flow.js
-```
-
-## Releases
-
-Releases are available on [Github](https://github.com/solana-labs/solana-web3.js/releases)
-and [npmjs.com](https://www.npmjs.com/package/@solana/web3.js)
-
-Each Github release features a tarball containing API documentation and a
-minified version of the module suitable for direct use in a browser environment
-(`<script>` tag)
 
 ## Disclaimer
 
 All claims, content, designs, algorithms, estimates, roadmaps,
 specifications, and performance measurements described in this project
-are done with the Solana Foundation's ("SF") best efforts. It is up to
+are done with the KOII Network best efforts. It is up to
 the reader to check and validate their accuracy and truthfulness.
 Furthermore nothing in this project constitutes a solicitation for
 investment.
@@ -127,7 +71,7 @@ investment.
 Any content produced by SF or developer resources that SF provides, are
 for educational and inspiration purposes only. SF does not encourage,
 induce or sanction the deployment, integration or use of any such
-applications (including the code comprising the Solana blockchain
+applications (including the code comprising the KOII blockchain
 protocol) in violation of applicable laws or regulations and hereby
 prohibits any such deployment, integration or use. This includes use of
 any such applications by the reader (a) in violation of export control
@@ -144,14 +88,14 @@ prohibit U.S. persons (and other persons that are subject to such laws)
 from transacting with persons in certain countries and territories or
 that are on the SDN list. As a project based primarily on open-source
 software, it is possible that such sanctioned persons may nevertheless
-bypass prohibitions, obtain the code comprising the Solana blockchain
+bypass prohibitions, obtain the code comprising the KOII blockchain
 protocol (or other project code or applications) and deploy, integrate,
 or otherwise use it. Accordingly, there is a risk to individuals that
-other persons using the Solana blockchain protocol may be sanctioned
+other persons using the KOII blockchain protocol may be sanctioned
 persons and that transactions with such persons would be a violation of
 U.S. export controls and sanctions law. This risk applies to
 individuals, organizations, and other ecosystem participants that
-deploy, integrate, or use the Solana blockchain protocol code directly
-(e.g., as a node operator), and individuals that transact on the Solana
+deploy, integrate, or use the KOII blockchain protocol code directly
+(e.g., as a node operator), and individuals that transact on the KOII
 blockchain through light clients, third party interfaces, and/or wallet
 software.
