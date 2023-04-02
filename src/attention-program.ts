@@ -1,13 +1,13 @@
 import * as BufferLayout from '@solana/buffer-layout';
-import {boolean} from 'superstruct';
 
-import {encodeData} from './instruction';
+
+import { encodeData } from './instruction';
 import * as Layout from './layout';
-import {PublicKey} from './publickey';
-import {SystemProgram} from './system-program';
-import {SYSVAR_CLOCK_PUBKEY, SYSVAR_STAKE_HISTORY_PUBKEY} from './sysvar';
-import {Transaction} from './transaction';
-import {toBuffer} from './util/to-buffer';
+import { PublicKey } from './publickey';
+import { SystemProgram } from './system-program';
+import { SYSVAR_CLOCK_PUBKEY, SYSVAR_STAKE_HISTORY_PUBKEY } from './sysvar';
+import { Transaction } from './transaction';
+import { toBuffer } from './util/to-buffer';
 
 /**
  * Address of the stake config account which configures the rate
@@ -40,7 +40,7 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
     index: 1,
     layout: BufferLayout.struct([
       BufferLayout.u32('instruction'),
-      Layout.publicKey('newAuthorized'),
+      BufferLayout.blob(64, 'CID'),
     ]),
   },
   Voting: {
@@ -80,7 +80,7 @@ export class AttentionProgram {
   /**
    * @internal
    */
-  constructor() {}
+  constructor() { }
 
   /**
    * Public key that identifies the Stake program
@@ -102,16 +102,15 @@ export class AttentionProgram {
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
   static SubmitPorts(params: any): Transaction {
-    const {attentionPubkey, accountDataPubkey} = params;
+    const { attentionPubkey, cid } = params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitPorts;
     const data = encodeData(type, {
-      account: toBuffer(accountDataPubkey.toBuffer()),
+      CID: cid,
     });
 
     const keys = [
-      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
-      {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
+      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
     ];
     return new Transaction().add({
       keys,
@@ -123,16 +122,16 @@ export class AttentionProgram {
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
   static RegisterRecipient(params: any): Transaction {
-    const {attentionPubkey, accountDataPubkey} = params;
+    const { attentionPubkey, accountDataPubkey } = params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.RegisterRecipient;
     const data = encodeData(type, {
       owner: toBuffer(accountDataPubkey.toBuffer()),
     });
 
     const keys = [
-      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
-      {pubkey: accountDataPubkey, isSigner: false, isWritable: false},
+      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
+      { pubkey: accountDataPubkey, isSigner: false, isWritable: false },
     ];
     return new Transaction().add({
       keys,
@@ -144,24 +143,24 @@ export class AttentionProgram {
    * Generate a Transaction that withdraws deactivated Stake tokens.
    */
   static withdraw(params: WithdrawStakeParams): Transaction {
-    const {stakePubkey, authorizedPubkey, toPubkey, lamports, custodianPubkey} =
+    const { stakePubkey, authorizedPubkey, toPubkey, lamports, custodianPubkey } =
       params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.Withdraw;
-    const data = encodeData(type, {lamports});
+    const data = encodeData(type, { lamports });
 
     const keys = [
-      {pubkey: stakePubkey, isSigner: false, isWritable: true},
-      {pubkey: toPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
+      { pubkey: stakePubkey, isSigner: false, isWritable: true },
+      { pubkey: toPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
       {
         pubkey: SYSVAR_STAKE_HISTORY_PUBKEY,
         isSigner: false,
         isWritable: false,
       },
-      {pubkey: authorizedPubkey, isSigner: true, isWritable: false},
+      { pubkey: authorizedPubkey, isSigner: true, isWritable: false },
     ];
     if (custodianPubkey) {
-      keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
+      keys.push({ pubkey: custodianPubkey, isSigner: false, isWritable: false });
     }
     return new Transaction().add({
       keys,
@@ -170,25 +169,25 @@ export class AttentionProgram {
     });
   }
   static addFunds(params: WithdrawStakeParams): Transaction {
-    const {stakePubkey, authorizedPubkey, toPubkey, lamports, custodianPubkey} =
+    const { stakePubkey, authorizedPubkey, toPubkey, lamports, custodianPubkey } =
       params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.AddFunds;
     console.log(type);
-    const data = encodeData(type, {lamports});
+    const data = encodeData(type, { lamports });
 
     const keys = [
-      {pubkey: stakePubkey, isSigner: false, isWritable: true},
-      {pubkey: toPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
+      { pubkey: stakePubkey, isSigner: false, isWritable: true },
+      { pubkey: toPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false },
       {
         pubkey: SYSVAR_STAKE_HISTORY_PUBKEY,
         isSigner: false,
         isWritable: false,
       },
-      {pubkey: authorizedPubkey, isSigner: true, isWritable: false},
+      { pubkey: authorizedPubkey, isSigner: true, isWritable: false },
     ];
     if (custodianPubkey) {
-      keys.push({pubkey: custodianPubkey, isSigner: false, isWritable: false});
+      keys.push({ pubkey: custodianPubkey, isSigner: false, isWritable: false });
     }
     return new Transaction().add({
       keys,
@@ -200,16 +199,16 @@ export class AttentionProgram {
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
   static Voting(params: any): Transaction {
-    const {attentionPubkey, accountDataPubkey, isValid} = params;
+    const { attentionPubkey, accountDataPubkey, isValid } = params;
     const type = ATTENTION_INSTRUCTION_LAYOUTS.Voting;
     const data = encodeData(type, {
       is_valid: isValid ? 1 : 0,
     });
 
     const keys = [
-      {pubkey: attentionPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
-      {pubkey: accountDataPubkey, isSigner: false, isWritable: true},
+      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+      { pubkey: accountDataPubkey, isSigner: false, isWritable: true },
     ];
     return new Transaction().add({
       keys,
@@ -234,3 +233,6 @@ export class AttentionProgram {
     return transaction;
   }
 }
+
+
+
