@@ -37,7 +37,7 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
     ]),
   },
   SubmitPorts: {
-    index: 1,
+    index: 0,
     layout: BufferLayout.struct([
       BufferLayout.u32('instruction'),
       BufferLayout.blob(64, 'CID'),
@@ -97,19 +97,28 @@ export class AttentionProgram {
    * https://docs.rs/solana-stake-program/1.4.4/solana_stake_program/stake_state/enum.StakeState.html
    */
   static space: number = 200;
-
+  static padStringWithSpaces(input: string, length: number): string {
+    if (input.length > length)
+      throw Error('Input exceeds the maximum length of ' + length);
+    input = input.padEnd(length);
+    return input;
+  }
   /**
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
   static SubmitPorts(params: any): Transaction {
-    const { attentionPubkey, cid } = params;
+    console.log(params);
+    let { attentionPubkey, cid, attentionMasterPubkey } = params;
+    attentionMasterPubkey  = new PublicKey(attentionMasterPubkey);
     const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitPorts;
+    cid =  new TextEncoder().encode(cid.padEnd(64));
     const data = encodeData(type, {
       CID: cid,
     });
 
     const keys = [
-      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: attentionPubkey, isSigner: true, isWritable: true },
+      { pubkey: attentionMasterPubkey, isSigner: false, isWritable: true },
       { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
     ];
     return new Transaction().add({
