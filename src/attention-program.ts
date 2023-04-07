@@ -2,7 +2,6 @@ import * as BufferLayout from '@solana/buffer-layout';
 
 
 import { encodeData } from './instruction';
-import * as Layout from './layout';
 import { PublicKey } from './publickey';
 import { SystemProgram } from './system-program';
 import { SYSVAR_CLOCK_PUBKEY, SYSVAR_STAKE_HISTORY_PUBKEY } from './sysvar';
@@ -27,40 +26,37 @@ export type AttentionInstructionType = 'RegisterRecipient' | 'SubmitPorts';
  * @internal
  */
 export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
-  RegisterRecipient: {
-    index: 0,
-    layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
-      // Layout.rustString("recipient"),
-      // BufferLayout.ns64("shares"),
-      Layout.publicKey('owner'),
-    ]),
-  },
   SubmitPorts: {
     index: 0,
     layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
-      BufferLayout.blob(64, 'CID'),
+      BufferLayout.u8('instruction'),
+      BufferLayout.blob(64, 'ipfs_cid'),
+    ]),
+  },
+  SubmitDistributionList: {
+    index: 4,
+    layout: BufferLayout.struct([
+      BufferLayout.u8('instruction')
     ]),
   },
   Voting: {
     index: 2,
     layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
+      BufferLayout.u8('instruction'),
       BufferLayout.ns64('is_valid'),
     ]),
   },
   Withdraw: {
     index: 3,
     layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
+      BufferLayout.u8('instruction'),
       BufferLayout.ns64('lamports'),
     ]),
   },
   AddFunds: {
     index: 4,
     layout: BufferLayout.struct([
-      BufferLayout.u32('instruction'),
+      BufferLayout.u8('instruction'),
       BufferLayout.ns64('lamports'),
     ]),
   },
@@ -104,22 +100,47 @@ export class AttentionProgram {
     return input;
   }
   /**
-   * Generate an Initialize instruction to add to a Stake Create transaction
+   * Generate an Initialize instruction to SubmitPorts
    */
   static SubmitPorts(params: any): Transaction {
     console.log(params);
     let { attentionPubkey, cid, attentionMasterPubkey } = params;
-    attentionMasterPubkey  = new PublicKey(attentionMasterPubkey);
+    attentionMasterPubkey = new PublicKey(attentionMasterPubkey);
     const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitPorts;
-    cid =  new TextEncoder().encode(cid.padEnd(64));
+
+    cid = new TextEncoder().encode(AttentionProgram.padStringWithSpaces(cid, 64));
+
     const data = encodeData(type, {
-      CID: cid,
+      ipfs_cid: cid,
     });
+    const keys = [
+      { pubkey: attentionPubkey, isSigner: true, isWritable: true },
+      { pubkey: attentionMasterPubkey, isSigner: false, isWritable: true },
+      { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+    ];
+    return new Transaction().add({
+      keys,
+      programId: this.programId,
+      data,
+    });
+  }
+
+  /**
+   * Generate an Initialize instruction to SubmitDistributionList
+   */
+  static SubmitDistributionList(params: any): Transaction {
+    console.log(params);
+    let { attentionPubkey, attentionMasterPubkey, distributionListAccountPubkey } = params;
+    attentionMasterPubkey = new PublicKey(attentionMasterPubkey);
+    const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitDistributionList;
+
+    const data = encodeData(type, {});
 
     const keys = [
       { pubkey: attentionPubkey, isSigner: true, isWritable: true },
       { pubkey: attentionMasterPubkey, isSigner: false, isWritable: true },
       { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
+      { pubkey: distributionListAccountPubkey, isSigner: true, isWritable: true },
     ];
     return new Transaction().add({
       keys,
