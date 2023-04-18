@@ -33,17 +33,17 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
       BufferLayout.blob(64, 'ipfs_cid'),
     ]),
   },
+  AuditPortMap: {
+    index: 1,
+    layout: BufferLayout.struct([
+      BufferLayout.u8('instruction'),
+      BufferLayout.ns64('is_valid'),
+    ]),
+  },
   SubmitDistributionList: {
     index: 4,
     layout: BufferLayout.struct([
       BufferLayout.u8('instruction')
-    ]),
-  },
-  Voting: {
-    index: 2,
-    layout: BufferLayout.struct([
-      BufferLayout.u8('instruction'),
-      BufferLayout.ns64('is_valid'),
     ]),
   },
   Withdraw: {
@@ -228,17 +228,18 @@ export class AttentionProgram {
   /**
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
-  static Voting(params: any): Transaction {
-    const { attentionPubkey, accountDataPubkey, isValid } = params;
-    const type = ATTENTION_INSTRUCTION_LAYOUTS.Voting;
+  static AuditPortMap(params: any): Transaction {
+    const { subnmitterPubkey, attentionMasterPubKey, isValid ,auditedPubKey} = params;
+    const type = ATTENTION_INSTRUCTION_LAYOUTS.AuditPortMap;
     const data = encodeData(type, {
       is_valid: isValid ? 1 : 0,
     });
 
     const keys = [
-      { pubkey: attentionPubkey, isSigner: false, isWritable: true },
+      { pubkey: subnmitterPubkey, isSigner: true, isWritable: true },
+      { pubkey: attentionMasterPubKey, isSigner: false, isWritable: true },
       { pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true },
-      { pubkey: accountDataPubkey, isSigner: false, isWritable: true },
+      { pubkey: auditedPubKey, isSigner: false, isWritable: true },
     ];
     return new Transaction().add({
       keys,
