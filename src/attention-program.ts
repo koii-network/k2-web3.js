@@ -119,6 +119,7 @@ export class AttentionProgram {
       {pubkey: attentionPubkey, isSigner: true, isWritable: true},
       {pubkey: attentionMasterPubkey, isSigner: false, isWritable: true},
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
+      {pubkey: attentionPubkey, isSigner: true, isWritable: true},
     ];
     return new Transaction().add({
       keys,
@@ -131,7 +132,7 @@ export class AttentionProgram {
     let {attentionPubkey, lazy_registration_ipfs_cid, attentionMasterPubkey} =
       params;
     attentionMasterPubkey = new PublicKey(attentionMasterPubkey);
-    const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitPorts;
+    const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitDistributionList;
 
     lazy_registration_ipfs_cid = new TextEncoder().encode(
       AttentionProgram.padStringWithSpaces(lazy_registration_ipfs_cid, 64),
@@ -144,6 +145,7 @@ export class AttentionProgram {
       {pubkey: attentionPubkey, isSigner: true, isWritable: true},
       {pubkey: attentionMasterPubkey, isSigner: false, isWritable: true},
       {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
+      {pubkey: attentionPubkey, isSigner: true, isWritable: true},
     ];
     return new Transaction().add({
       keys,
@@ -154,30 +156,32 @@ export class AttentionProgram {
   /**
    * Generate an Initialize instruction to SubmitDistributionList
    */
-  static SubmitDistributionList(params: any): Transaction {
-    console.log(params);
-    let {
-      attentionPubkey,
-      attentionMasterPubkey,
-      distributionListAccountPubkey,
-    } = params;
-    attentionMasterPubkey = new PublicKey(attentionMasterPubkey);
-    const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitDistributionList;
+  // static SubmitDistributionList(params: any): Transaction {
+  //   console.log(params);
+  //   let {
+  //     attentionPubkey,
+  //     attentionMasterPubkey,
+  //     lazy_registration_ipfs_cid
+  //   } = params;
+  //   attentionMasterPubkey = new PublicKey(attentionMasterPubkey);
+  //   const type = ATTENTION_INSTRUCTION_LAYOUTS.SubmitDistributionList;
 
-    const data = encodeData(type, {});
+  //   const data = encodeData(type, {
+  //     lazy_registration_ipfs_cid
+  //   });
 
-    const keys = [
-      {pubkey: attentionPubkey, isSigner: true, isWritable: true},
-      {pubkey: attentionMasterPubkey, isSigner: false, isWritable: true},
-      {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: true},
-      {pubkey: distributionListAccountPubkey, isSigner: true, isWritable: true},
-    ];
-    return new Transaction().add({
-      keys,
-      programId: this.programId,
-      data,
-    });
-  }
+  //   const keys = [
+  //     {pubkey: attentionPubkey, isSigner: true, isWritable: false},
+  //     {pubkey: attentionMasterPubkey, isSigner: false, isWritable: true},
+  //     {pubkey: SYSVAR_CLOCK_PUBKEY, isSigner: false, isWritable: false},
+  //     {pubkey: attentionPubkey, isSigner: true, isWritable: true},
+  //   ];
+  //   return new Transaction().add({
+  //     keys,
+  //     programId: this.programId,
+  //     data,
+  //   });
+  // }
   /**
    * Generate an Initialize instruction to add to a Stake Create transaction
    */
