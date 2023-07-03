@@ -1,5 +1,4 @@
 import * as BufferLayout from '@solana/buffer-layout';
-import {boolean} from 'superstruct';
 
 import {encodeData} from './instruction';
 import * as Layout from './layout';
@@ -29,7 +28,7 @@ export type AttentionInstructionType = 'RegisterRecipient' | 'SubmitPorts';
 export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
   RegisterRecipient: {
     index: 0,
-    layout: BufferLayout.struct([
+    layout: BufferLayout.struct<any>([
       BufferLayout.u32('instruction'),
       // Layout.rustString("recipient"),
       // BufferLayout.ns64("shares"),
@@ -38,28 +37,28 @@ export const ATTENTION_INSTRUCTION_LAYOUTS: any = Object.freeze({
   },
   SubmitPorts: {
     index: 1,
-    layout: BufferLayout.struct([
+    layout: BufferLayout.struct<any>([
       BufferLayout.u32('instruction'),
       Layout.publicKey('newAuthorized'),
     ]),
   },
   Voting: {
     index: 2,
-    layout: BufferLayout.struct([
+    layout: BufferLayout.struct<any>([
       BufferLayout.u32('instruction'),
       BufferLayout.ns64('is_valid'),
     ]),
   },
   Withdraw: {
     index: 3,
-    layout: BufferLayout.struct([
+    layout: BufferLayout.struct<any>([
       BufferLayout.u32('instruction'),
       BufferLayout.ns64('lamports'),
     ]),
   },
   AddFunds: {
     index: 4,
-    layout: BufferLayout.struct([
+    layout: BufferLayout.struct<any>([
       BufferLayout.u32('instruction'),
       BufferLayout.ns64('lamports'),
     ]),

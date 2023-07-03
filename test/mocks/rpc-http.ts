@@ -58,6 +58,14 @@ export const mockRpcBatchResponse = async ({
     .thenReply(200, JSON.stringify(response));
 };
 
+function isPromise<T>(obj: PromiseLike<T> | T): obj is PromiseLike<T> {
+  return (
+    !!obj &&
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof (obj as any).then === 'function'
+  );
+}
+
 export const mockRpcResponse = async ({
   method,
   params,
@@ -68,22 +76,12 @@ export const mockRpcResponse = async ({
 }: {
   method: string;
   params: Array<any>;
-  value?: any;
+  value?: Promise<any> | any;
   error?: any;
   withContext?: boolean;
   withHeaders?: HttpHeaders;
 }) => {
   if (!mockServer) return;
-
-  let result = value;
-  if (withContext) {
-    result = {
-      context: {
-        slot: 11,
-      },
-      value,
-    };
-  }
 
   await mockServer
     .post('/')
@@ -93,15 +91,57 @@ export const mockRpcResponse = async ({
       params,
     })
     .withHeaders(withHeaders || {})
-    .thenReply(
-      200,
-      JSON.stringify({
-        jsonrpc: '2.0',
-        id: '',
-        error,
-        result,
-      }),
-    );
+    .thenCallback(async () => {
+      try {
+        const unwrappedValue = isPromise(value) ? await value : value;
+        let result = unwrappedValue;
+        if (withContext) {
+          result = {
+            context: {
+              slot: 11,
+            },
+            value: unwrappedValue,
+          };
+        }
+        return {
+          statusCode: 200,
+          json: {
+            jsonrpc: '2.0',
+            id: '',
+            error,
+            result,
+          },
+        };
+      } catch (_e) {
+        return {statusCode: 500};
+      }
+    });
+};
+
+const latestBlockhash = async ({
+  connection,
+  commitment,
+}: {
+  connection: Connection;
+  commitment?: Commitment;
+}) => {
+  const blockhash = uniqueBlockhash();
+  const params = [];
+  if (commitment) {
+    params.push({commitment});
+  }
+
+  await mockRpcResponse({
+    method: 'getLatestBlockhash',
+    params,
+    value: {
+      blockhash,
+      lastValidBlockHeight: 3090,
+    },
+    withContext: true,
+  });
+
+  return await connection.getLatestBlockhash(commitment);
 };
 
 const recentBlockhash = async ({
@@ -145,7 +185,8 @@ const processTransaction = async ({
   commitment: Commitment;
   err?: any;
 }) => {
-  const blockhash = (await recentBlockhash({connection})).blockhash;
+  const {blockhash, lastValidBlockHeight} = await latestBlockhash({connection});
+  transaction.lastValidBlockHeight = lastValidBlockHeight;
   transaction.recentBlockhash = blockhash;
   transaction.sign(...signers);
 
@@ -176,8 +217,16 @@ const processTransaction = async ({
     params: [signature, {commitment}],
     result: {err: err || null},
   });
+  await mockRpcMessage({
+    method: 'signatureUnsubscribe',
+    params: [1],
+    result: true,
+  });
 
-  return await connection.confirmTransaction(signature, commitment);
+  return await connection.confirmTransaction(
+    {blockhash, lastValidBlockHeight, signature},
+    commitment,
+  );
 };
 
 const airdrop = async ({
@@ -202,6 +251,11 @@ const airdrop = async ({
     params: [signature, {commitment: 'confirmed'}],
     result: {err: null},
   });
+  await mockRpcMessage({
+    method: 'signatureUnsubscribe',
+    params: [1],
+    result: true,
+  });
 
   await connection.confirmTransaction(signature, 'confirmed');
   return signature;
@@ -211,4 +265,5 @@ export const helpers = {
   airdrop,
   processTransaction,
   recentBlockhash,
+  latestBlockhash,
 };

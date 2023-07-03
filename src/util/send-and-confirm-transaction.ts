@@ -24,6 +24,8 @@ export async function sendAndConfirmTransaction(
   const sendOptions = options && {
     skipPreflight: options.skipPreflight,
     preflightCommitment: options.preflightCommitment || options.commitment,
+    maxRetries: options.maxRetries,
+    minContextSlot: options.minContextSlot,
   };
 
   const signature = await connection.sendTransaction(
@@ -32,12 +34,25 @@ export async function sendAndConfirmTransaction(
     sendOptions,
   );
 
-  const status = (
-    await connection.confirmTransaction(
-      signature,
-      options && options.commitment,
-    )
-  ).value;
+  const status =
+    transaction.recentBlockhash != null &&
+    transaction.lastValidBlockHeight != null
+      ? (
+          await connection.confirmTransaction(
+            {
+              signature: signature,
+              blockhash: transaction.recentBlockhash,
+              lastValidBlockHeight: transaction.lastValidBlockHeight,
+            },
+            options && options.commitment,
+          )
+        ).value
+      : (
+          await connection.confirmTransaction(
+            signature,
+            options && options.commitment,
+          )
+        ).value;
 
   if (status.err) {
     throw new Error(
