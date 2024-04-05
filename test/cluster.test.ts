@@ -10,13 +10,13 @@ describe('Cluster Util', () => {
   });
 
   it('devnet', () => {
-    expect(clusterApiUrl()).to.eq('https://api.devnet.solana.com');
-    expect(clusterApiUrl('devnet')).to.eq('https://api.devnet.solana.com');
-    expect(clusterApiUrl('devnet', true)).to.eq(
-      'https://api.devnet.solana.com',
+    expect(clusterApiUrl()).to.eq('https://testnet.koii.live');
+    expect(clusterApiUrl('devnet')).to.eq('https://testnet.koii.live');
+    expect(clusterApiUrl('testnet', true)).to.eq(
+      'https://testnet.koii.network',
     );
-    expect(clusterApiUrl('devnet', false)).to.eq(
-      'http://api.devnet.solana.com',
+    expect(clusterApiUrl('testnet', false)).to.eq(
+      'http://testnet.koii.network',
     );
   });
 });
