@@ -10,23 +10,23 @@ This is the KOII (K2) Javascript API built on the KOII [JSON RPC API](https://do
 ### Yarn
 
 ```
-$ yarn add @_koi/web3.js
+$ yarn add @_koii/web3.js
 ```
 
 ### npm
 
 ```
-$ npm install --save @_koi/web3.js
+$ npm install --save @_koii/web3.js
 ```
 
 ### Browser bundle
 
 ```html
 <!-- Development (un-minified) -->
-<script src="https://unpkg.com/@_koi/web3.js@latest/lib/index.iife.js"></script>
+<script src="https://unpkg.com/@_koii/web3.js@latest/lib/index.iife.js"></script>
 
 <!-- Production (minified) -->
-<script src="https://unpkg.com/@_koi/web3.js@latest/lib/index.iife.min.js"></script>
+<script src="https://unpkg.com/@_koii/web3.js@latest/lib/index.iife.min.js"></script>
 ```
 
 ## Usage
@@ -34,14 +34,14 @@ $ npm install --save @_koi/web3.js
 ### Javascript
 
 ```js
-const koiiWeb3 = require('@_koi/web3.js');
+const koiiWeb3 = require('@_koii/web3.js');
 console.log(koiiWeb3);
 ```
 
 ### ES6
 
 ```js
-import * as koiiWeb3 from '@_koi/web3.js';
+import * as koiiWeb3 from '@_koii/web3.js';
 console.log(koiiWeb3);
 ```
 
