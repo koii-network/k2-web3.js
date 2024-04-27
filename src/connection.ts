@@ -1055,7 +1055,6 @@ const AccountInfoResult = pick({
   rentEpoch: number(),
 });
 
-
 /**
  * @internal
  */
@@ -2486,15 +2485,22 @@ export class Connection {
    */
   async getTaskAccountInfoAndContext(
     publicKey: PublicKey,
+    is_submission_required?: boolean,
+    is_distribution_required?: boolean,
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<any | null>> {
-    const args = this._buildArgs([publicKey.toBase58()], commitment, 'base64');
+    const args = this._buildArgsForTask(
+      [publicKey.toBase58()],
+      commitment,
+      'base64',
+      is_submission_required,
+      is_distribution_required,
+    );
     const unsafeRes = await this._rpcRequest('getTaskAccountInfo', args);
     const res = create(
       unsafeRes,
       jsonRpcResultAndContext(nullable(TaskStateResult)),
     );
-    console.log(res);
     if ('error' in res) {
       throw new Error(
         'failed to get info about account ' +
@@ -2558,11 +2564,15 @@ export class Connection {
    */
   async getTaskAccountInfo(
     publicKey: PublicKey,
+    is_submission_required?: boolean,
+    is_distribution_required?: boolean,
     commitment?: Commitment,
   ): Promise<AccountInfo<Buffer> | null> {
     try {
       const res = await this.getTaskAccountInfoAndContext(
         publicKey,
+        is_submission_required,
+        is_distribution_required,
         commitment,
       );
       return res.value;
@@ -4331,6 +4341,41 @@ export class Connection {
     return args;
   }
 
+  _buildArgsForTask(
+    args: Array<any>,
+    override?: Commitment,
+    encoding?: 'jsonParsed' | 'base64',
+    is_submission_required?: boolean,
+    is_distribution_required?: boolean,
+  ): Array<any> {
+    const commitment = override || this._commitment;
+    if (
+      commitment ||
+      encoding ||
+      is_submission_required != undefined ||
+      is_distribution_required != undefined
+    ) {
+      let options: any = {};
+      if (encoding) {
+        options.encoding = encoding;
+      }
+      if (commitment) {
+        options.commitment = commitment;
+      }
+      if (is_submission_required === false || is_submission_required === true) {
+        options.commitment = is_submission_required;
+      }
+      if (
+        is_distribution_required === false ||
+        is_submission_required === true
+      ) {
+        options.commitment = is_distribution_required;
+      }
+
+      args.push(options);
+    }
+    return args;
+  }
   /**
    * @internal
    */
