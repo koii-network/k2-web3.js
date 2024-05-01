@@ -1,7 +1,7 @@
 import bs58 from 'bs58';
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
 import fetch from 'cross-fetch';
-import type {Response} from 'cross-fetch';
+import type { Response } from 'cross-fetch';
 import {
   type as pick,
   number,
@@ -20,29 +20,29 @@ import {
   unknown,
   any,
 } from 'superstruct';
-import type {Struct} from 'superstruct';
-import {Client as RpcWebSocketClient} from 'rpc-websockets';
+import type { Struct } from 'superstruct';
+import { Client as RpcWebSocketClient } from 'rpc-websockets';
 import RpcClient from 'jayson/lib/client/browser';
-import {IWSRequestParams} from 'rpc-websockets/dist/lib/client';
+import { IWSRequestParams } from 'rpc-websockets/dist/lib/client';
 
-import {AgentManager} from './agent-manager';
-import {EpochSchedule} from './epoch-schedule';
-import {SendTransactionError} from './errors';
-import {NonceAccount} from './nonce-account';
-import {PublicKey} from './publickey';
-import {Signer} from './keypair';
-import {MS_PER_SLOT} from './timing';
-import {Transaction} from './transaction';
-import {Message} from './message';
+import { AgentManager } from './agent-manager';
+import { EpochSchedule } from './epoch-schedule';
+import { SendTransactionError } from './errors';
+import { NonceAccount } from './nonce-account';
+import { PublicKey } from './publickey';
+import { Signer } from './keypair';
+import { MS_PER_SLOT } from './timing';
+import { Transaction } from './transaction';
+import { Message } from './message';
 import assert from './util/assert';
-import {sleep} from './util/sleep';
-import {promiseTimeout} from './util/promise-timeout';
-import {toBuffer} from './util/to-buffer';
-import {makeWebsocketUrl} from './util/url';
-import type {Blockhash} from './blockhash';
-import type {FeeCalculator} from './fee-calculator';
-import type {TransactionSignature} from './transaction';
-import type {CompiledInstruction} from './message';
+import { sleep } from './util/sleep';
+import { promiseTimeout } from './util/promise-timeout';
+import { toBuffer } from './util/to-buffer';
+import { makeWebsocketUrl } from './util/url';
+import type { Blockhash } from './blockhash';
+import type { FeeCalculator } from './fee-calculator';
+import type { TransactionSignature } from './transaction';
+import type { CompiledInstruction } from './message';
 
 const PublicKeyFromString = coerce(
   instance(PublicKey),
@@ -78,11 +78,11 @@ export type RpcParams = {
 
 export type TokenAccountsFilter =
   | {
-      mint: PublicKey;
-    }
+    mint: PublicKey;
+  }
   | {
-      programId: PublicKey;
-    };
+    programId: PublicKey;
+  };
 
 /**
  * Extra contextual information for RPC responses
@@ -800,7 +800,7 @@ function createRpcClient(
       let too_many_requests_retries = 5;
       let res: Response;
       let waitTime = 500;
-      for (;;) {
+      for (; ;) {
         if (fetchWithMiddleware) {
           res = await fetchWithMiddleware(url, options);
         } else {
@@ -1234,48 +1234,48 @@ const SlotNotificationResult = pick({
  */
 export type SlotUpdate =
   | {
-      type: 'firstShredReceived';
-      slot: number;
-      timestamp: number;
-    }
+    type: 'firstShredReceived';
+    slot: number;
+    timestamp: number;
+  }
   | {
-      type: 'completed';
-      slot: number;
-      timestamp: number;
-    }
+    type: 'completed';
+    slot: number;
+    timestamp: number;
+  }
   | {
-      type: 'createdBank';
-      slot: number;
-      timestamp: number;
-      parent: number;
-    }
+    type: 'createdBank';
+    slot: number;
+    timestamp: number;
+    parent: number;
+  }
   | {
-      type: 'frozen';
-      slot: number;
-      timestamp: number;
-      stats: {
-        numTransactionEntries: number;
-        numSuccessfulTransactions: number;
-        numFailedTransactions: number;
-        maxTransactionsPerEntry: number;
-      };
-    }
-  | {
-      type: 'dead';
-      slot: number;
-      timestamp: number;
-      err: string;
-    }
-  | {
-      type: 'optimisticConfirmation';
-      slot: number;
-      timestamp: number;
-    }
-  | {
-      type: 'root';
-      slot: number;
-      timestamp: number;
+    type: 'frozen';
+    slot: number;
+    timestamp: number;
+    stats: {
+      numTransactionEntries: number;
+      numSuccessfulTransactions: number;
+      numFailedTransactions: number;
+      maxTransactionsPerEntry: number;
     };
+  }
+  | {
+    type: 'dead';
+    slot: number;
+    timestamp: number;
+    err: string;
+  }
+  | {
+    type: 'optimisticConfirmation';
+    slot: number;
+    timestamp: number;
+  }
+  | {
+    type: 'root';
+    slot: number;
+    timestamp: number;
+  };
 
 /**
  * @internal
@@ -2022,7 +2022,7 @@ export type ConfirmedSignatureInfo = {
 /**
  * An object defining headers to be passed to the RPC server
  */
-export type HttpHeaders = {[header: string]: string};
+export type HttpHeaders = { [header: string]: string };
 
 /**
  * A callback used to augment the outgoing HTTP request
@@ -2065,60 +2065,60 @@ export class Connection {
   /** @internal */ _rpcWebSocket: RpcWebSocketClient;
   /** @internal */ _rpcWebSocketConnected: boolean = false;
   /** @internal */ _rpcWebSocketHeartbeat: ReturnType<
-    typeof setInterval
-  > | null = null;
+  typeof setInterval
+> | null = null;
   /** @internal */ _rpcWebSocketIdleTimeout: ReturnType<
-    typeof setTimeout
-  > | null = null;
+  typeof setTimeout
+> | null = null;
 
   /** @internal */ _disableBlockhashCaching: boolean = false;
   /** @internal */ _pollingBlockhash: boolean = false;
   /** @internal */ _blockhashInfo: {
-    recentBlockhash: Blockhash | null;
-    lastFetch: number;
-    simulatedSignatures: Array<string>;
-    transactionSignatures: Array<string>;
-  } = {
-    recentBlockhash: null,
-    lastFetch: 0,
-    transactionSignatures: [],
-    simulatedSignatures: [],
-  };
+  recentBlockhash: Blockhash | null;
+  lastFetch: number;
+  simulatedSignatures: Array<string>;
+  transactionSignatures: Array<string>;
+} = {
+      recentBlockhash: null,
+      lastFetch: 0,
+      transactionSignatures: [],
+      simulatedSignatures: [],
+    };
 
   /** @internal */ _accountChangeSubscriptionCounter: number = 0;
   /** @internal */ _accountChangeSubscriptions: {
-    [id: number]: AccountSubscriptionInfo;
-  } = {};
+      [id: number]: AccountSubscriptionInfo;
+    } = {};
 
   /** @internal */ _programAccountChangeSubscriptionCounter: number = 0;
   /** @internal */ _programAccountChangeSubscriptions: {
-    [id: number]: ProgramAccountSubscriptionInfo;
-  } = {};
+      [id: number]: ProgramAccountSubscriptionInfo;
+    } = {};
 
   /** @internal */ _rootSubscriptionCounter: number = 0;
   /** @internal */ _rootSubscriptions: {
-    [id: number]: RootSubscriptionInfo;
-  } = {};
+      [id: number]: RootSubscriptionInfo;
+    } = {};
 
   /** @internal */ _signatureSubscriptionCounter: number = 0;
   /** @internal */ _signatureSubscriptions: {
-    [id: number]: SignatureSubscriptionInfo;
-  } = {};
+      [id: number]: SignatureSubscriptionInfo;
+    } = {};
 
   /** @internal */ _slotSubscriptionCounter: number = 0;
   /** @internal */ _slotSubscriptions: {
-    [id: number]: SlotSubscriptionInfo;
-  } = {};
+      [id: number]: SlotSubscriptionInfo;
+    } = {};
 
   /** @internal */ _logsSubscriptionCounter: number = 0;
   /** @internal */ _logsSubscriptions: {
-    [id: number]: LogsSubscriptionInfo;
-  } = {};
+      [id: number]: LogsSubscriptionInfo;
+    } = {};
 
   /** @internal */ _slotUpdateSubscriptionCounter: number = 0;
   /** @internal */ _slotUpdateSubscriptions: {
-    [id: number]: SlotUpdateSubscriptionInfo;
-  } = {};
+      [id: number]: SlotUpdateSubscriptionInfo;
+    } = {};
 
   /**
    * Establish a JSON RPC connection
@@ -2219,9 +2219,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get balance for ' +
-          publicKey.toBase58() +
-          ': ' +
-          res.error.message,
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2294,7 +2294,7 @@ export class Connection {
   ): Promise<RpcResponseAndContext<Supply>> {
     let configArg: GetSupplyConfig = {};
     if (typeof config === 'string') {
-      configArg = {commitment: config};
+      configArg = { commitment: config };
     } else if (config) {
       configArg = {
         ...config,
@@ -2359,14 +2359,14 @@ export class Connection {
     commitment?: Commitment,
   ): Promise<
     RpcResponseAndContext<
-      Array<{pubkey: PublicKey; account: AccountInfo<Buffer>}>
+      Array<{ pubkey: PublicKey; account: AccountInfo<Buffer> }>
     >
   > {
     let _args: any[] = [ownerAddress.toBase58()];
     if ('mint' in filter) {
-      _args.push({mint: filter.mint.toBase58()});
+      _args.push({ mint: filter.mint.toBase58() });
     } else {
-      _args.push({programId: filter.programId.toBase58()});
+      _args.push({ programId: filter.programId.toBase58() });
     }
 
     const args = this._buildArgs(_args, commitment, 'base64');
@@ -2375,9 +2375,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get token accounts owned by account ' +
-          ownerAddress.toBase58() +
-          ': ' +
-          res.error.message,
+        ownerAddress.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2394,14 +2394,14 @@ export class Connection {
     commitment?: Commitment,
   ): Promise<
     RpcResponseAndContext<
-      Array<{pubkey: PublicKey; account: AccountInfo<ParsedAccountData>}>
+      Array<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }>
     >
   > {
     let _args: any[] = [ownerAddress.toBase58()];
     if ('mint' in filter) {
-      _args.push({mint: filter.mint.toBase58()});
+      _args.push({ mint: filter.mint.toBase58() });
     } else {
-      _args.push({programId: filter.programId.toBase58()});
+      _args.push({ programId: filter.programId.toBase58() });
     }
 
     const args = this._buildArgs(_args, commitment, 'jsonParsed');
@@ -2410,9 +2410,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get token accounts owned by account ' +
-          ownerAddress.toBase58() +
-          ': ' +
-          res.error.message,
+        ownerAddress.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2472,9 +2472,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get info about account ' +
-          publicKey.toBase58() +
-          ': ' +
-          res.error.message,
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2504,14 +2504,104 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get info about account ' +
-          publicKey.toBase58() +
-          ': ' +
-          res.error.message,
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
   }
 
+
+  /**
+* Fetch all the Task distribution info for the specified public key, return with context
+*/
+  async getMyTaskSubmissionRoundInfoAndContext(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    round?: number,
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmissionRoundCheck(
+      [publicKey.toBase58(), account_address.toBase58()],
+      commitment,
+      round,
+    );
+    const unsafeRes = await this._rpcRequest('getMyTaskSubmissionRoundInfo', args);
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateResult)),
+    );
+    if ('error' in res) {
+      throw new Error(
+        'failed to get info about account ' +
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
+      );
+    }
+    return res.result;
+  }
+  /**
+ * Fetch all the Task distribution info for the specified public key, return with context
+ */
+  async getTaskDistributionInfoAndContext(
+    publicKey: PublicKey,
+    round?: number,
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmission(
+      [publicKey.toBase58()],
+      commitment,
+      'base64',
+      round,
+    );
+    const unsafeRes = await this._rpcRequest('getTaskDistributionInfo', args);
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateResult)),
+    );
+    if ('error' in res) {
+      throw new Error(
+        'failed to get info about account ' +
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
+      );
+    }
+    return res.result;
+  }
+
+
+  /**
+   * Fetch all the Task submission info for the specified public key, return with context
+   */
+  async getTaskSubmissionInfoAndContext(
+    publicKey: PublicKey,
+    round?: number,
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmission(
+      [publicKey.toBase58()],
+      commitment,
+      'base64',
+      round,
+    );
+    const unsafeRes = await this._rpcRequest('getTaskSubmissionInfo', args);
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateResult)),
+    );
+    if ('error' in res) {
+      throw new Error(
+        'failed to get info about account ' +
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
+      );
+    }
+    return res.result;
+  }
   /**
    * Fetch parsed account info for the specified public key
    */
@@ -2534,9 +2624,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get info about account ' +
-          publicKey.toBase58() +
-          ': ' +
-          res.error.message,
+        publicKey.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2560,7 +2650,7 @@ export class Connection {
   }
 
   /**
-   * Fetch all the account info for the specified public key
+   * Fetch all the task account info for the specified public key
    */
   async getTaskAccountInfo(
     publicKey: PublicKey,
@@ -2573,6 +2663,74 @@ export class Connection {
         publicKey,
         is_submission_required,
         is_distribution_required,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(
+        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+      );
+    }
+  }
+
+  /**
+   * Fetch all the account info for the specified public key
+   */
+  async getTaskSubmissionInfo(
+    publicKey: PublicKey,
+    round?: number,
+    commitment?: Commitment,
+  ): Promise<AccountInfo<Buffer> | null> {
+    try {
+      const res = await this.getTaskSubmissionInfoAndContext(
+        publicKey,
+        round,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(
+        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+      );
+    }
+  }
+
+  /**
+  * Fetch all the account info for the specified public key
+  */
+  async getTaskDistributionInfo(
+    publicKey: PublicKey,
+    round?: number,
+    commitment?: Commitment,
+  ): Promise<AccountInfo<Buffer> | null> {
+    try {
+      const res = await this.getTaskDistributionInfoAndContext(
+        publicKey,
+        round,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(
+        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+      );
+    }
+  }
+
+  /**
+  * Fetch all the account info for the specified public key
+  */
+  async getMyTaskSubmissionRoundInfo(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    round: number,
+    commitment?: Commitment,
+  ): Promise<AccountInfo<Buffer> | null> {
+    try {
+      const res = await this.getMyTaskSubmissionRoundInfoAndContext(
+        publicKey,
+        account_address,
+        round,
         commitment,
       );
       return res.value;
@@ -2630,15 +2788,14 @@ export class Connection {
       [publicKey.toBase58()],
       commitment,
       undefined,
-      epoch !== undefined ? {epoch} : undefined,
+      epoch !== undefined ? { epoch } : undefined,
     );
 
     const unsafeRes = await this._rpcRequest('getStakeActivation', args);
     const res = create(unsafeRes, jsonRpcResult(StakeActivationResult));
     if ('error' in res) {
       throw new Error(
-        `failed to get Stake Activation ${publicKey.toBase58()}: ${
-          res.error.message
+        `failed to get Stake Activation ${publicKey.toBase58()}: ${res.error.message
         }`,
       );
     }
@@ -2653,7 +2810,7 @@ export class Connection {
   async getProgramAccounts(
     programId: PublicKey,
     configOrCommitment?: GetProgramAccountsConfig | Commitment,
-  ): Promise<Array<{pubkey: PublicKey; account: AccountInfo<Buffer>}>> {
+  ): Promise<Array<{ pubkey: PublicKey; account: AccountInfo<Buffer> }>> {
     const extra: Pick<GetProgramAccountsConfig, 'dataSlice' | 'filters'> = {};
 
     let commitment;
@@ -2685,9 +2842,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get accounts owned by program ' +
-          programId.toBase58() +
-          ': ' +
-          res.error.message,
+        programId.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2736,9 +2893,9 @@ export class Connection {
     if ('error' in res) {
       throw new Error(
         'failed to get accounts owned by program ' +
-          programId.toBase58() +
-          ': ' +
-          res.error.message,
+        programId.toBase58() +
+        ': ' +
+        res.error.message,
       );
     }
     return res.result;
@@ -2897,13 +3054,13 @@ export class Connection {
     signature: TransactionSignature,
     config?: SignatureStatusConfig,
   ): Promise<RpcResponseAndContext<SignatureStatus | null>> {
-    const {context, value: values} = await this.getSignatureStatuses(
+    const { context, value: values } = await this.getSignatureStatuses(
       [signature],
       config,
     );
     assert(values.length === 1);
     const value = values[0];
-    return {context, value};
+    return { context, value };
   }
 
   /**
@@ -3063,7 +3220,7 @@ export class Connection {
   async getRecentBlockhashAndContext(
     commitment?: Commitment,
   ): Promise<
-    RpcResponseAndContext<{blockhash: Blockhash; feeCalculator: FeeCalculator}>
+    RpcResponseAndContext<{ blockhash: Blockhash; feeCalculator: FeeCalculator }>
   > {
     const args = this._buildArgs([], commitment);
     const unsafeRes = await this._rpcRequest('getRecentBlockhash', args);
@@ -3113,7 +3270,7 @@ export class Connection {
     if ('error' in res) {
       throw new Error('failed to get fee calculator: ' + res.error.message);
     }
-    const {context, value} = res.result;
+    const { context, value } = res.result;
     return {
       context,
       value: value !== null ? value.feeCalculator : null,
@@ -3147,7 +3304,7 @@ export class Connection {
    */
   async getRecentBlockhash(
     commitment?: Commitment,
-  ): Promise<{blockhash: Blockhash; feeCalculator: FeeCalculator}> {
+  ): Promise<{ blockhash: Blockhash; feeCalculator: FeeCalculator }> {
     try {
       const res = await this.getRecentBlockhashAndContext(commitment);
       return res.value;
@@ -3185,7 +3342,7 @@ export class Connection {
    */
   async getBlock(
     slot: number,
-    opts?: {commitment?: Finality},
+    opts?: { commitment?: Finality },
   ): Promise<BlockResponse | null> {
     const args = this._buildArgsAtLeastConfirmed(
       [slot],
@@ -3203,7 +3360,7 @@ export class Connection {
 
     return {
       ...result,
-      transactions: result.transactions.map(({transaction, meta}) => {
+      transactions: result.transactions.map(({ transaction, meta }) => {
         const message = new Message(transaction.message);
         return {
           meta,
@@ -3221,7 +3378,7 @@ export class Connection {
    */
   async getTransaction(
     signature: string,
-    opts?: {commitment?: Finality},
+    opts?: { commitment?: Finality },
   ): Promise<TransactionResponse | null> {
     const args = this._buildArgsAtLeastConfirmed(
       [signature],
@@ -3257,14 +3414,14 @@ export class Connection {
     slot: number,
     commitment?: Finality,
   ): Promise<ConfirmedBlock> {
-    const result = await this.getBlock(slot, {commitment});
+    const result = await this.getBlock(slot, { commitment });
     if (!result) {
       throw new Error('Confirmed block ' + slot + ' not found');
     }
 
     return {
       ...result,
-      transactions: result.transactions.map(({transaction, meta}) => {
+      transactions: result.transactions.map(({ transaction, meta }) => {
         return {
           meta,
           transaction: Transaction.populate(
@@ -3331,9 +3488,9 @@ export class Connection {
     signature: TransactionSignature,
     commitment?: Finality,
   ): Promise<ConfirmedTransaction | null> {
-    const result = await this.getTransaction(signature, {commitment});
+    const result = await this.getTransaction(signature, { commitment });
     if (!result) return result;
-    const {message, signatures} = result.transaction;
+    const { message, signatures } = result.transaction;
     return {
       ...result,
       transaction: Transaction.populate(message, signatures),
@@ -3534,7 +3691,7 @@ export class Connection {
     nonceAccount: PublicKey,
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<NonceAccount | null>> {
-    const {context, value: accountInfo} = await this.getAccountInfoAndContext(
+    const { context, value: accountInfo } = await this.getAccountInfoAndContext(
       nonceAccount,
       commitment,
     );
@@ -3562,9 +3719,9 @@ export class Connection {
       .catch(e => {
         throw new Error(
           'failed to get nonce for account ' +
-            nonceAccount.toBase58() +
-            ': ' +
-            e,
+          nonceAccount.toBase58() +
+          ': ' +
+          e,
         );
       });
   }
@@ -3627,7 +3784,7 @@ export class Connection {
     try {
       const startTime = Date.now();
       for (let i = 0; i < 50; i++) {
-        const {blockhash} = await this.getRecentBlockhash('finalized');
+        const { blockhash } = await this.getRecentBlockhash('finalized');
 
         if (this._blockhashInfo.recentBlockhash != blockhash) {
           this._blockhashInfo = {
@@ -3670,7 +3827,7 @@ export class Connection {
       transaction.sign(...signers);
     } else {
       let disableCache = this._disableBlockhashCaching;
-      for (;;) {
+      for (; ;) {
         transaction.recentBlockhash = await this._recentBlockhash(disableCache);
 
         if (!signers) break;
@@ -3758,7 +3915,7 @@ export class Connection {
       transaction.sign(...signers);
     } else {
       let disableCache = this._disableBlockhashCaching;
-      for (;;) {
+      for (; ;) {
         transaction.recentBlockhash = await this._recentBlockhash(disableCache);
         transaction.sign(...signers);
         if (!transaction.signature) {
@@ -3809,7 +3966,7 @@ export class Connection {
     encodedTransaction: string,
     options?: SendOptions,
   ): Promise<TransactionSignature> {
-    const config: any = {encoding: 'base64'};
+    const config: any = { encoding: 'base64' };
     const skipPreflight = options && options.skipPreflight;
     const preflightCommitment =
       (options && options.preflightCommitment) || this.commitment;
@@ -3849,7 +4006,7 @@ export class Connection {
     this._rpcWebSocketConnected = true;
     this._rpcWebSocketHeartbeat = setInterval(() => {
       // Ping server every 5s to prevent idle timeouts
-      this._rpcWebSocket.notify('ping').catch(() => {});
+      this._rpcWebSocket.notify('ping').catch(() => { });
     }, 5000);
     this._updateSubscriptions();
   }
@@ -3884,7 +4041,7 @@ export class Connection {
    * @internal
    */
   async _subscribe(
-    sub: {subscriptionId: SubscriptionId | null},
+    sub: { subscriptionId: SubscriptionId | null },
     rpcMethod: string,
     rpcArgs: IWSRequestParams,
   ) {
@@ -3916,7 +4073,7 @@ export class Connection {
    * @internal
    */
   async _unsubscribe(
-    sub: {subscriptionId: SubscriptionId | null},
+    sub: { subscriptionId: SubscriptionId | null },
     rpcMethod: string,
   ) {
     const subscriptionId = sub.subscriptionId;
@@ -4049,7 +4206,7 @@ export class Connection {
       const sub = this._logsSubscriptions[id];
       let filter;
       if (typeof sub.filter === 'object') {
-        filter = {mentions: [sub.filter.toString()]};
+        filter = { mentions: [sub.filter.toString()] };
       } else {
         filter = sub.filter;
       }
@@ -4121,7 +4278,7 @@ export class Connection {
     const res = create(notification, ProgramAccountNotificationResult);
     for (const sub of Object.values(this._programAccountChangeSubscriptions)) {
       if (sub.subscriptionId === res.subscription) {
-        const {value, context} = res.result;
+        const { value, context } = res.result;
         sub.callback(
           {
             accountId: value.pubkey,
@@ -4362,16 +4519,60 @@ export class Connection {
       if (commitment) {
         options.commitment = commitment;
       }
-      if (is_submission_required === false || is_submission_required === true) {
-        options.commitment = is_submission_required;
-      }
-      if (
-        is_distribution_required === false ||
-        is_submission_required === true
-      ) {
-        options.commitment = is_distribution_required;
-      }
+      options.is_submission_required = is_submission_required;
+      options.is_distribution_required = is_distribution_required;
 
+      args.push(options);
+    }
+    return args;
+  }
+
+  _buildArgsForTaskSubmission(
+    args: Array<any>,
+    override?: Commitment,
+    encoding?: 'jsonParsed' | 'base64',
+    round?: number,
+  ): Array<any> {
+    const commitment = override || this._commitment;
+    if (
+      commitment ||
+      encoding ||
+      round
+    ) {
+      let options: any = {};
+      if (encoding) {
+        options.encoding = encoding;
+      }
+      if (commitment) {
+        options.commitment = commitment;
+      }
+      if (this.isNumber(round))
+        options.round = round;
+      else
+        options.round = -1;
+      args.push(options);
+    }
+    return args;
+  }
+
+  _buildArgsForTaskSubmissionRoundCheck(
+    args: Array<any>,
+    override?: Commitment,
+    round?: number,
+  ): Array<any> {
+    const commitment = override || this._commitment;
+    if (
+      commitment ||
+      round
+    ) {
+      let options: any = {};
+      if (commitment) {
+        options.commitment = commitment;
+      }
+      if (this.isNumber(round))
+        options.round = round;
+      else
+        options.round = -1;
       args.push(options);
     }
     return args;
@@ -4389,8 +4590,8 @@ export class Connection {
     if (commitment && !['confirmed', 'finalized'].includes(commitment)) {
       throw new Error(
         'Using Connection with default commitment: `' +
-          this._commitment +
-          '`, but method requires at least `confirmed`',
+        this._commitment +
+        '`, but method requires at least `confirmed`',
       );
     }
     return this._buildArgs(args, override, encoding, extra);
@@ -4449,7 +4650,7 @@ export class Connection {
           callback(notification.result, context);
         }
       },
-      options: {commitment},
+      options: { commitment },
       subscriptionId: null,
     };
     this._updateSubscriptions();
@@ -4541,5 +4742,9 @@ export class Connection {
     } else {
       throw new Error(`Unknown root change id: ${id}`);
     }
+  }
+
+  isNumber(value: number | undefined) {
+    return typeof value === 'number' && !isNaN(value);
   }
 }
