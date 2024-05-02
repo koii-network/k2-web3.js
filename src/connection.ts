@@ -1061,6 +1061,10 @@ const AccountInfoResult = pick({
 const TaskStateResult = pick({
   data: BufferFromRawAccountData,
 });
+
+const TaskStateRoundResult = pick({
+  data: boolean(),
+});
 // const TaskStateResult = pick({
 //   is_allowlisted: boolean(),
 //   task_name: string(),
@@ -2503,7 +2507,6 @@ export class Connection {
     );
     if ('error' in res) {
       throw new Error(
-        'failed to get info about account ' +
         publicKey.toBase58() +
         ': ' +
         res.error.message,
@@ -2519,7 +2522,7 @@ export class Connection {
   async getMyTaskSubmissionRoundInfoAndContext(
     publicKey: PublicKey,
     account_address: PublicKey,
-    round?: number,
+    round: number,
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<any | null>> {
     const args = this._buildArgsForTaskSubmissionRoundCheck(
@@ -2530,11 +2533,10 @@ export class Connection {
     const unsafeRes = await this._rpcRequest('getMyTaskSubmissionRoundInfo', args);
     const res = create(
       unsafeRes,
-      jsonRpcResultAndContext(nullable(TaskStateResult)),
+      jsonRpcResultAndContext(nullable(TaskStateRoundResult)),
     );
     if ('error' in res) {
       throw new Error(
-        'failed to get info about account ' +
         publicKey.toBase58() +
         ': ' +
         res.error.message,
@@ -2563,7 +2565,6 @@ export class Connection {
     );
     if ('error' in res) {
       throw new Error(
-        'failed to get info about account ' +
         publicKey.toBase58() +
         ': ' +
         res.error.message,
@@ -2594,7 +2595,6 @@ export class Connection {
     );
     if ('error' in res) {
       throw new Error(
-        'failed to get info about account ' +
         publicKey.toBase58() +
         ': ' +
         res.error.message,
@@ -2668,7 +2668,7 @@ export class Connection {
       return res.value;
     } catch (e) {
       throw new Error(
-        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+        e + '',
       );
     }
   }
@@ -2690,7 +2690,7 @@ export class Connection {
       return res.value;
     } catch (e) {
       throw new Error(
-        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+        e + '',
       );
     }
   }
@@ -2712,7 +2712,7 @@ export class Connection {
       return res.value;
     } catch (e) {
       throw new Error(
-        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+        e + '',
       );
     }
   }
@@ -2736,7 +2736,7 @@ export class Connection {
       return res.value;
     } catch (e) {
       throw new Error(
-        'failed to get info about account ' + publicKey.toBase58() + ': ' + e,
+        e + '',
       );
     }
   }
