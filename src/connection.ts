@@ -2492,15 +2492,19 @@ export class Connection {
     publicKey: PublicKey,
     is_submission_required?: boolean,
     is_distribution_required?: boolean,
+    is_available_balances_required?: boolean,
+    is_stake_list_required?: boolean,
     encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<any | null>> {
     const args = this._buildArgsForTask(
       [publicKey.toBase58()],
       commitment,
-      encoding,
+      encoding || 'base64',
       is_submission_required,
       is_distribution_required,
+      is_available_balances_required,
+      is_stake_list_required
     );
     const unsafeRes = await this._rpcRequest('getTaskAccountInfo', args);
     const res = create(
@@ -2516,6 +2520,8 @@ export class Connection {
     }
     return res.result;
   }
+
+  // TODO: Add the mongo zstd decompression method and expose it
 
 
   /**
@@ -2558,7 +2564,7 @@ export class Connection {
     const args = this._buildArgsForTaskSubmission(
       [publicKey.toBase58()],
       commitment,
-      encoding,
+      encoding || 'base64',
       round,
     );
     const unsafeRes = await this._rpcRequest('getTaskDistributionInfo', args);
@@ -2589,7 +2595,7 @@ export class Connection {
     const args = this._buildArgsForTaskSubmission(
       [publicKey.toBase58()],
       commitment,
-      encoding,
+      encoding || 'base64',
       round,
     );
     const unsafeRes = await this._rpcRequest('getTaskSubmissionInfo', args);
@@ -2641,10 +2647,11 @@ export class Connection {
    */
   async getAccountInfo(
     publicKey: PublicKey,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<AccountInfo<Buffer> | null> {
     try {
-      const res = await this.getAccountInfoAndContext(publicKey, commitment);
+      const res = await this.getAccountInfoAndContext(publicKey, encoding, commitment);
       return res.value;
     } catch (e) {
       throw new Error(
@@ -2660,6 +2667,9 @@ export class Connection {
     publicKey: PublicKey,
     is_submission_required?: boolean,
     is_distribution_required?: boolean,
+    is_available_balances_required?: boolean,
+    is_stake_list_required?: boolean,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<AccountInfo<Buffer> | null> {
     try {
@@ -2667,6 +2677,9 @@ export class Connection {
         publicKey,
         is_submission_required,
         is_distribution_required,
+        is_available_balances_required,
+        is_stake_list_required,
+        encoding,
         commitment,
       );
       return res.value;
@@ -2683,12 +2696,14 @@ export class Connection {
   async getTaskSubmissionInfo(
     publicKey: PublicKey,
     round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<AccountInfo<Buffer> | null> {
     try {
       const res = await this.getTaskSubmissionInfoAndContext(
         publicKey,
         round,
+        encoding,
         commitment,
       );
       return res.value;
@@ -2705,12 +2720,14 @@ export class Connection {
   async getTaskDistributionInfo(
     publicKey: PublicKey,
     round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<AccountInfo<Buffer> | null> {
     try {
       const res = await this.getTaskDistributionInfoAndContext(
         publicKey,
         round,
+        encoding,
         commitment,
       );
       return res.value;
@@ -3697,6 +3714,7 @@ export class Connection {
   ): Promise<RpcResponseAndContext<NonceAccount | null>> {
     const { context, value: accountInfo } = await this.getAccountInfoAndContext(
       nonceAccount,
+      'base64',
       commitment,
     );
 
@@ -4508,6 +4526,8 @@ export class Connection {
     encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     is_submission_required?: boolean,
     is_distribution_required?: boolean,
+    is_available_balances_required?: boolean,
+    is_stake_list_required?: boolean,
   ): Array<any> {
     const commitment = override || this._commitment;
     if (
@@ -4525,6 +4545,8 @@ export class Connection {
       }
       options.is_submission_required = is_submission_required;
       options.is_distribution_required = is_distribution_required;
+      options.is_available_balances_required = is_available_balances_required;
+      options.is_stake_list_required = is_stake_list_required;
 
       args.push(options);
     }

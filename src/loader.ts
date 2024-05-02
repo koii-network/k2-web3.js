@@ -71,6 +71,7 @@ export class Loader {
       // Fetch program account info to check if it has already been created
       const programInfo = await connection.getAccountInfo(
         program.publicKey,
+        'base64',
         'confirmed',
       );
 
