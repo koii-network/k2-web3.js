@@ -1059,7 +1059,7 @@ const AccountInfoResult = pick({
  * @internal
  */
 const TaskStateResult = pick({
-  data: BufferFromRawAccountData,
+  data: unknown(),
 });
 
 const TaskStateRoundResult = pick({
@@ -2465,9 +2465,10 @@ export class Connection {
    */
   async getAccountInfoAndContext(
     publicKey: PublicKey,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<AccountInfo<Buffer> | null>> {
-    const args = this._buildArgs([publicKey.toBase58()], commitment, 'base64');
+    const args = this._buildArgs([publicKey.toBase58()], commitment, encoding || 'base64');
     const unsafeRes = await this._rpcRequest('getAccountInfo', args);
     const res = create(
       unsafeRes,
@@ -2491,12 +2492,13 @@ export class Connection {
     publicKey: PublicKey,
     is_submission_required?: boolean,
     is_distribution_required?: boolean,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<any | null>> {
     const args = this._buildArgsForTask(
       [publicKey.toBase58()],
       commitment,
-      'base64',
+      encoding,
       is_submission_required,
       is_distribution_required,
     );
@@ -2550,12 +2552,13 @@ export class Connection {
   async getTaskDistributionInfoAndContext(
     publicKey: PublicKey,
     round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<any | null>> {
     const args = this._buildArgsForTaskSubmission(
       [publicKey.toBase58()],
       commitment,
-      'base64',
+      encoding,
       round,
     );
     const unsafeRes = await this._rpcRequest('getTaskDistributionInfo', args);
@@ -2580,12 +2583,13 @@ export class Connection {
   async getTaskSubmissionInfoAndContext(
     publicKey: PublicKey,
     round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<RpcResponseAndContext<any | null>> {
     const args = this._buildArgsForTaskSubmission(
       [publicKey.toBase58()],
       commitment,
-      'base64',
+      encoding,
       round,
     );
     const unsafeRes = await this._rpcRequest('getTaskSubmissionInfo', args);
@@ -4478,7 +4482,7 @@ export class Connection {
   _buildArgs(
     args: Array<any>,
     override?: Commitment,
-    encoding?: 'jsonParsed' | 'base64',
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     extra?: any,
   ): Array<any> {
     const commitment = override || this._commitment;
@@ -4501,7 +4505,7 @@ export class Connection {
   _buildArgsForTask(
     args: Array<any>,
     override?: Commitment,
-    encoding?: 'jsonParsed' | 'base64',
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     is_submission_required?: boolean,
     is_distribution_required?: boolean,
   ): Array<any> {
@@ -4530,7 +4534,7 @@ export class Connection {
   _buildArgsForTaskSubmission(
     args: Array<any>,
     override?: Commitment,
-    encoding?: 'jsonParsed' | 'base64',
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     round?: number,
   ): Array<any> {
     const commitment = override || this._commitment;
