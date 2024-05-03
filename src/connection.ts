@@ -4549,10 +4549,10 @@ export class Connection {
       if (commitment) {
         options.commitment = commitment;
       }
-      options.is_submission_required = is_submission_required;
-      options.is_distribution_required = is_distribution_required;
-      options.is_available_balances_required = is_available_balances_required;
-      options.is_stake_list_required = is_stake_list_required;
+      options.submission = is_submission_required;
+      options.distribution = is_distribution_required;
+      options.balance = is_available_balances_required;
+      options.stake = is_stake_list_required;
 
       args.push(options);
     }
