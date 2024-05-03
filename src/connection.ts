@@ -1070,40 +1070,6 @@ const TaskStateResult = pick({
 const TaskStateRoundResult = pick({
   data: boolean(),
 });
-// const TaskStateResult = pick({
-//   is_allowlisted: boolean(),
-//   task_name: string(),
-//   task_description: string(),
-//   task_manager: any(),
-//   is_active: boolean(),
-//   task_audit_program: string(),
-//   stake_pot_account: any(),
-//   submissions: any(),  // You might want to define a more specific structure here if possible
-//   submissions_audit_trigger: any(), // Same note as above
-//   total_bounty_amount: number(),
-//   bounty_amount_per_round: number(),
-//   total_stake_amount: number(),
-//   minimum_stake_amount: number(),
-//   // You might define `TaskStatus` as a TypeScript enum or use string() with constraints if specific values are expected
-//   // status: string(), // Assuming status is uncommented and you have predefined the possible strings
-//   available_balances: any(), // Ideally, this should be a map of strings to numbers
-//   stake_list: any(), // Same as above, map of strings to numbers
-//   ip_address_list: any(), // Map of strings to strings
-//   round_time: number(),
-//   starting_slot: number(),
-//   audit_window: number(),
-//   submission_window: number(),
-//   task_executable_network: string(),
-//   distribution_rewards_submission: any(), // Map of strings to a more complex object structure
-//   distributions_audit_trigger: any(), // Map of strings to a more complex object structure
-//   distributions_audit_record: any(), // Map, possibly with a specific enum or structure for the values
-//   task_metadata: string(),
-//   task_vars: string(),
-//   koii_vars: string(),
-//   is_migrated: boolean(),
-//   migrated_to: string(),
-//   allowed_failed_distributions: number(),
-// });
 
 /**
  * @internal
@@ -2511,7 +2477,6 @@ export class Connection {
       is_available_balances_required,
       is_stake_list_required
     );
-    console.log("ARGS", args);
     const unsafeRes = await this._rpcRequest('getTaskAccountInfo', args);
     const res = create(
       unsafeRes,
@@ -2526,8 +2491,6 @@ export class Connection {
     }
     return res.result;
   }
-
-  // TODO: Add the mongo zstd decompression method and expose it
 
 
   /**
