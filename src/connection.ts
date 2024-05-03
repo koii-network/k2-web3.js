@@ -58,6 +58,11 @@ const BufferFromRawAccountData = coerce(
   value => Buffer.from(value[0], 'base64'),
 );
 
+const BufferFromRawTaskAccountData = coerce(
+  any(),
+  RawAccountDataResult,
+  value => Buffer.from(value[0], 'base64'),
+);
 /**
  * Attempt to use a recent blockhash for up to 30 seconds
  * @internal
@@ -1059,7 +1064,7 @@ const AccountInfoResult = pick({
  * @internal
  */
 const TaskStateResult = pick({
-  data: unknown(),
+  data: BufferFromRawTaskAccountData,
 });
 
 const TaskStateRoundResult = pick({
@@ -2506,6 +2511,7 @@ export class Connection {
       is_available_balances_required,
       is_stake_list_required
     );
+    console.log("ARGS", args);
     const unsafeRes = await this._rpcRequest('getTaskAccountInfo', args);
     const res = create(
       unsafeRes,
