@@ -82,7 +82,7 @@ export class Loader {
           return false;
         }
 
-        if (programInfo.data.length !== data.length) {
+        if (programInfo?.data?.length !== data.length) {
           transaction = transaction || new Transaction();
           transaction.add(
             SystemProgram.allocate({

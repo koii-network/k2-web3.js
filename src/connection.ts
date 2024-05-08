@@ -57,6 +57,11 @@ const BufferFromRawAccountData = coerce(
   RawAccountDataResult,
   value => Buffer.from(value[0], 'base64'),
 );
+const BufferFromRawGetAccountData = coerce(
+  any(),
+  RawAccountDataResult,
+  value => Buffer.from(value[0], 'base64'),
+);
 
 const BufferFromRawTaskAccountData = coerce(
   any(),
@@ -1060,6 +1065,13 @@ const AccountInfoResult = pick({
   rentEpoch: number(),
 });
 
+const GetAccountInfoResult = pick({
+  executable: boolean(),
+  owner: PublicKeyFromString,
+  lamports: number(),
+  data: BufferFromRawGetAccountData,
+  rentEpoch: number(),
+});
 /**
  * @internal
  */
@@ -1750,7 +1762,7 @@ export type AccountInfo<T> = {
   /** Number of lamports assigned to the account */
   lamports: number;
   /** Optional data assigned to the account */
-  data: T;
+  data?: T;
   /** Optional rent epoch info for account */
   rentEpoch?: number;
 };
@@ -1760,7 +1772,7 @@ export type TaskState<T> = {
 };
 
 export type TaskStateRound = {
-  data: boolean,
+  data: boolean;
 };
 
 /**
@@ -2446,7 +2458,7 @@ export class Connection {
     publicKey: PublicKey,
     encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
-  ): Promise<RpcResponseAndContext<AccountInfo<Buffer> | null>> {
+  ): Promise<RpcResponseAndContext<AccountInfo<any> | null>> {
     const args = this._buildArgs(
       [publicKey.toBase58()],
       commitment,
@@ -2455,7 +2467,7 @@ export class Connection {
     const unsafeRes = await this._rpcRequest('getAccountInfo', args);
     const res = create(
       unsafeRes,
-      jsonRpcResultAndContext(nullable(AccountInfoResult)),
+      jsonRpcResultAndContext(nullable(GetAccountInfoResult)),
     );
     if ('error' in res) {
       throw new Error(
