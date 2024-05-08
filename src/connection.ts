@@ -57,10 +57,8 @@ const BufferFromRawAccountData = coerce(
   RawAccountDataResult,
   value => Buffer.from(value[0], 'base64'),
 );
-const BufferFromRawGetAccountData = coerce(
-  any(),
-  RawAccountDataResult,
-  value => Buffer.from(value[0], 'base64'),
+const BufferFromRawGetAccountData = coerce(any(), RawAccountDataResult, value =>
+  Buffer.from(value[0], 'base64'),
 );
 
 const BufferFromRawTaskAccountData = coerce(
@@ -1080,7 +1078,7 @@ const TaskStateResult = pick({
 });
 
 const TaskStateRoundResult = pick({
-  data: boolean(),
+  data: any(),
 });
 
 /**
@@ -2539,6 +2537,32 @@ export class Connection {
     }
     return res.result;
   }
+
+  /**
+   * Fetch all the Task distribution info for the specified public key, return with context
+   */
+  async getMyTaskStakeInfoAndContext(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmissionRoundCheck(
+      [publicKey.toBase58(), account_address.toBase58()],
+      commitment,
+    );
+    const unsafeRes = await this._rpcRequest(
+      'getMyTaskStakeInfo',
+      args,
+    );
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateRoundResult)),
+    );
+    if ('error' in res) {
+      throw new Error(publicKey.toBase58() + ': ' + res.error.message);
+    }
+    return res.result;
+  }
   /**
    * Fetch all the Task distribution info for the specified public key, return with context
    */
@@ -2715,7 +2739,7 @@ export class Connection {
   }
 
   /**
-   * Fetch all the account info for the specified public key
+   * Fetch all the submissions of a task for the specified public key
    */
   async getMyTaskSubmissionRoundInfo(
     publicKey: PublicKey,
@@ -2736,6 +2760,25 @@ export class Connection {
     }
   }
 
+  /**
+   * Fetch all the account info for the specified public key
+   */
+  async getMyTaskStakeInfo(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    commitment?: Commitment,
+  ): Promise<TaskStateRound | null> {
+    try {
+      const res = await this.getMyTaskStakeInfoAndContext(
+        publicKey,
+        account_address,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(e + '');
+    }
+  }
   /**
    * Fetch all the account info for multiple accounts specified by an array of public keys
    */
@@ -4562,7 +4605,6 @@ export class Connection {
         options.commitment = commitment;
       }
       if (this.isNumber(round)) options.round = round;
-      else options.round = -1;
       args.push(options);
     }
     return args;
