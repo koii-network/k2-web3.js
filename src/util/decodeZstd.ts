@@ -9,5 +9,5 @@ export async function decodeZstd(base64ZstdData: string) {
   const compressedData = Buffer.from(base64ZstdData, 'base64');
   const decompressedData = await zstd.decompress(compressedData);
 
-  return decompressedData.toString();
+  return decompressedData;
 }
