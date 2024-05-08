@@ -1770,7 +1770,7 @@ export type TaskState<T> = {
 };
 
 export type TaskStateRound = {
-  data: boolean;
+  data: any;
 };
 
 /**
