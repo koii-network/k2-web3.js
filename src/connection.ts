@@ -57,7 +57,15 @@ const BufferFromRawAccountData = coerce(
   RawAccountDataResult,
   value => Buffer.from(value[0], 'base64'),
 );
+const BufferFromRawGetAccountData = coerce(any(), RawAccountDataResult, value =>
+  Buffer.from(value[0], 'base64'),
+);
 
+const BufferFromRawTaskAccountData = coerce(
+  any(),
+  RawAccountDataResult,
+  value => Buffer.from(value[0], 'base64'),
+);
 /**
  * Attempt to use a recent blockhash for up to 30 seconds
  * @internal
@@ -1060,6 +1068,24 @@ const AccountInfoResult = pick({
   rentEpoch: number(),
 });
 
+const GetAccountInfoResult = pick({
+  executable: boolean(),
+  owner: PublicKeyFromString,
+  lamports: number(),
+  data: BufferFromRawGetAccountData,
+  rentEpoch: number(),
+});
+/**
+ * @internal
+ */
+const TaskStateResult = pick({
+  data: BufferFromRawTaskAccountData,
+});
+
+const TaskStateRoundResult = pick({
+  data: any(),
+});
+
 /**
  * @internal
  */
@@ -1739,9 +1765,17 @@ export type AccountInfo<T> = {
   /** Number of lamports assigned to the account */
   lamports: number;
   /** Optional data assigned to the account */
-  data: T;
+  data?: T;
   /** Optional rent epoch info for account */
   rentEpoch?: number;
+};
+
+export type TaskState<T> = {
+  data: T;
+};
+
+export type TaskStateRound = {
+  data: any;
 };
 
 /**
@@ -2430,13 +2464,18 @@ export class Connection {
    */
   async getAccountInfoAndContext(
     publicKey: PublicKey,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
-  ): Promise<RpcResponseAndContext<AccountInfo<Buffer> | null>> {
-    const args = this._buildArgs([publicKey.toBase58()], commitment, 'base64');
+  ): Promise<RpcResponseAndContext<AccountInfo<any> | null>> {
+    const args = this._buildArgs(
+      [publicKey.toBase58()],
+      commitment,
+      encoding || 'base64',
+    );
     const unsafeRes = await this._rpcRequest('getAccountInfo', args);
     const res = create(
       unsafeRes,
-      jsonRpcResultAndContext(nullable(AccountInfoResult)),
+      jsonRpcResultAndContext(nullable(GetAccountInfoResult)),
     );
     if ('error' in res) {
       throw new Error(
@@ -2449,6 +2488,142 @@ export class Connection {
     return res.result;
   }
 
+  /**
+   * Fetch all the account info for the specified public key, return with context
+   */
+  async getTaskAccountInfoAndContext(
+    publicKey: PublicKey,
+    is_submission_required?: boolean,
+    is_distribution_required?: boolean,
+    is_available_balances_required?: boolean,
+    is_stake_list_required?: boolean,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTask(
+      [publicKey.toBase58()],
+      commitment,
+      encoding || 'base64',
+      is_submission_required,
+      is_distribution_required,
+      is_available_balances_required,
+      is_stake_list_required,
+    );
+    const unsafeRes = await this._rpcRequest('getTaskAccountInfo', args);
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateResult)),
+    );
+    if ('error' in res) {
+      throw new Error(publicKey.toBase58() + ': ' + res.error.message);
+    }
+    return res.result;
+  }
+
+  /**
+   * Fetch all the Task distribution info for the specified public key, return with context
+   */
+  async getMyTaskSubmissionRoundInfoAndContext(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    round: number,
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmissionRoundCheck(
+      [publicKey.toBase58(), account_address.toBase58()],
+      commitment,
+      round,
+    );
+    const unsafeRes = await this._rpcRequest(
+      'getMyTaskSubmissionRoundInfo',
+      args,
+    );
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateRoundResult)),
+    );
+    if ('error' in res) {
+      throw new Error(publicKey.toBase58() + ': ' + res.error.message);
+    }
+    return res.result;
+  }
+
+  /**
+   * Fetch all the Task distribution info for the specified public key, return with context
+   */
+  async getMyTaskStakeInfoAndContext(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmissionRoundCheck(
+      [publicKey.toBase58(), account_address.toBase58()],
+      commitment,
+    );
+    const unsafeRes = await this._rpcRequest(
+      'getMyTaskStakeInfo',
+      args,
+    );
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateRoundResult)),
+    );
+    if ('error' in res) {
+      throw new Error(publicKey.toBase58() + ': ' + res.error.message);
+    }
+    return res.result;
+  }
+  /**
+   * Fetch all the Task distribution info for the specified public key, return with context
+   */
+  async getTaskDistributionInfoAndContext(
+    publicKey: PublicKey,
+    round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmission(
+      [publicKey.toBase58()],
+      commitment,
+      encoding || 'base64',
+      round,
+    );
+    const unsafeRes = await this._rpcRequest('getTaskDistributionInfo', args);
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateResult)),
+    );
+    if ('error' in res) {
+      throw new Error(publicKey.toBase58() + ': ' + res.error.message);
+    }
+    return res.result;
+  }
+
+  /**
+   * Fetch all the Task submission info for the specified public key, return with context
+   */
+  async getTaskSubmissionInfoAndContext(
+    publicKey: PublicKey,
+    round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    commitment?: Commitment,
+  ): Promise<RpcResponseAndContext<any | null>> {
+    const args = this._buildArgsForTaskSubmission(
+      [publicKey.toBase58()],
+      commitment,
+      encoding || 'base64',
+      round,
+    );
+    const unsafeRes = await this._rpcRequest('getTaskSubmissionInfo', args);
+    const res = create(
+      unsafeRes,
+      jsonRpcResultAndContext(nullable(TaskStateResult)),
+    );
+    if ('error' in res) {
+      throw new Error(publicKey.toBase58() + ': ' + res.error.message);
+    }
+    return res.result;
+  }
   /**
    * Fetch parsed account info for the specified public key
    */
@@ -2484,10 +2659,15 @@ export class Connection {
    */
   async getAccountInfo(
     publicKey: PublicKey,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     commitment?: Commitment,
   ): Promise<AccountInfo<Buffer> | null> {
     try {
-      const res = await this.getAccountInfoAndContext(publicKey, commitment);
+      const res = await this.getAccountInfoAndContext(
+        publicKey,
+        encoding,
+        commitment,
+      );
       return res.value;
     } catch (e) {
       throw new Error(
@@ -2496,6 +2676,119 @@ export class Connection {
     }
   }
 
+  /**
+   * Fetch all the task account info for the specified public key
+   */
+  async getTaskAccountInfo(
+    publicKey: PublicKey,
+    is_submission_required?: boolean,
+    is_distribution_required?: boolean,
+    is_available_balances_required?: boolean,
+    is_stake_list_required?: boolean,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    commitment?: Commitment,
+  ): Promise<TaskState<Buffer> | null> {
+    try {
+      const res = await this.getTaskAccountInfoAndContext(
+        publicKey,
+        is_submission_required,
+        is_distribution_required,
+        is_available_balances_required,
+        is_stake_list_required,
+        encoding,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(e + '');
+    }
+  }
+
+  /**
+   * Fetch all the account info for the specified public key
+   */
+  async getTaskSubmissionInfo(
+    publicKey: PublicKey,
+    round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    commitment?: Commitment,
+  ): Promise<TaskState<Buffer> | null> {
+    try {
+      const res = await this.getTaskSubmissionInfoAndContext(
+        publicKey,
+        round,
+        encoding,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(e + '');
+    }
+  }
+
+  /**
+   * Fetch all the account info for the specified public key
+   */
+  async getTaskDistributionInfo(
+    publicKey: PublicKey,
+    round?: number,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    commitment?: Commitment,
+  ): Promise<TaskState<Buffer> | null> {
+    try {
+      const res = await this.getTaskDistributionInfoAndContext(
+        publicKey,
+        round,
+        encoding,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(e + '');
+    }
+  }
+
+  /**
+   * Fetch all the submissions of a task for the specified public key
+   */
+  async getMyTaskSubmissionRoundInfo(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    round: number,
+    commitment?: Commitment,
+  ): Promise<TaskStateRound | null> {
+    try {
+      const res = await this.getMyTaskSubmissionRoundInfoAndContext(
+        publicKey,
+        account_address,
+        round,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(e + '');
+    }
+  }
+
+  /**
+   * Fetch all the account info for the specified public key
+   */
+  async getMyTaskStakeInfo(
+    publicKey: PublicKey,
+    account_address: PublicKey,
+    commitment?: Commitment,
+  ): Promise<TaskStateRound | null> {
+    try {
+      const res = await this.getMyTaskStakeInfoAndContext(
+        publicKey,
+        account_address,
+        commitment,
+      );
+      return res.value;
+    } catch (e) {
+      throw new Error(e + '');
+    }
+  }
   /**
    * Fetch all the account info for multiple accounts specified by an array of public keys
    */
@@ -3449,6 +3742,7 @@ export class Connection {
   ): Promise<RpcResponseAndContext<NonceAccount | null>> {
     const {context, value: accountInfo} = await this.getAccountInfoAndContext(
       nonceAccount,
+      'base64',
       commitment,
     );
 
@@ -4234,7 +4528,7 @@ export class Connection {
   _buildArgs(
     args: Array<any>,
     override?: Commitment,
-    encoding?: 'jsonParsed' | 'base64',
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
     extra?: any,
   ): Array<any> {
     const commitment = override || this._commitment;
@@ -4254,6 +4548,77 @@ export class Connection {
     return args;
   }
 
+  _buildArgsForTask(
+    args: Array<any>,
+    override?: Commitment,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    is_submission_required?: boolean,
+    is_distribution_required?: boolean,
+    is_available_balances_required?: boolean,
+    is_stake_list_required?: boolean,
+  ): Array<any> {
+    const commitment = override || this._commitment;
+    if (
+      commitment ||
+      encoding ||
+      is_submission_required != undefined ||
+      is_distribution_required != undefined
+    ) {
+      let options: any = {};
+      if (encoding) {
+        options.encoding = encoding;
+      }
+      if (commitment) {
+        options.commitment = commitment;
+      }
+      options.submission = is_submission_required;
+      options.distribution = is_distribution_required;
+      options.balance = is_available_balances_required;
+      options.stake = is_stake_list_required;
+
+      args.push(options);
+    }
+    return args;
+  }
+
+  _buildArgsForTaskSubmission(
+    args: Array<any>,
+    override?: Commitment,
+    encoding?: 'jsonParsed' | 'base64' | 'base64+zstd',
+    round?: number,
+  ): Array<any> {
+    const commitment = override || this._commitment;
+    if (commitment || encoding || round) {
+      let options: any = {};
+      if (encoding) {
+        options.encoding = encoding;
+      }
+      if (commitment) {
+        options.commitment = commitment;
+      }
+      if (this.isNumber(round)) options.round = round;
+      else options.round = -1;
+      args.push(options);
+    }
+    return args;
+  }
+
+  _buildArgsForTaskSubmissionRoundCheck(
+    args: Array<any>,
+    override?: Commitment,
+    round?: number,
+  ): Array<any> {
+    const commitment = override || this._commitment;
+    if (commitment || round) {
+      let options: any = {};
+      if (commitment) {
+        options.commitment = commitment;
+      }
+      if (this.isNumber(round)) options.round = round;
+      args.push(options);
+    }
+    return args;
+  }
   /**
    * @internal
    */
@@ -4419,5 +4784,9 @@ export class Connection {
     } else {
       throw new Error(`Unknown root change id: ${id}`);
     }
+  }
+
+  isNumber(value: number | undefined) {
+    return typeof value === 'number' && !isNaN(value);
   }
 }
