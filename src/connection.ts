@@ -1,7 +1,6 @@
 import bs58 from 'bs58';
 import {Buffer} from 'buffer';
 import fetch from 'cross-fetch';
-import type {Response} from 'cross-fetch';
 import {
   type as pick,
   number,
@@ -75,6 +74,8 @@ export const BLOCKHASH_CACHE_TIMEOUT_MS = 30 * 1000;
 type RpcRequest = (methodName: string, args: Array<any>) => any;
 
 type RpcBatchRequest = (requests: RpcParams[]) => any;
+
+type CustomFetch = (input: string | Request, init?: any) => Promise<Response>;
 
 /**
  * @internal
@@ -763,7 +764,7 @@ function createRpcClient(
   httpHeaders?: HttpHeaders,
   fetchMiddleware?: FetchMiddleware,
   disableRetryOnRateLimit?: boolean,
-  fetchFn?: typeof fetch,
+  fetchFn?: CustomFetch,
 ): RpcClient {
   let agentManager: AgentManager | undefined;
   if (!process.env.BROWSER) {
@@ -2048,7 +2049,7 @@ export type ConnectionConfig = {
   /** time to allow for the server to initially process a transaction (in milliseconds) */
   confirmTransactionInitialTimeout?: number;
   /** custom fetch function */
-  customFetch?: typeof fetch;
+  customFetch?: CustomFetch;
 };
 
 /**
@@ -2560,10 +2561,7 @@ export class Connection {
       [publicKey.toBase58(), account_address.toBase58()],
       commitment,
     );
-    const unsafeRes = await this._rpcRequest(
-      'getMyTaskStakeInfo',
-      args,
-    );
+    const unsafeRes = await this._rpcRequest('getMyTaskStakeInfo', args);
     const res = create(
       unsafeRes,
       jsonRpcResultAndContext(nullable(TaskStateRoundResult)),
