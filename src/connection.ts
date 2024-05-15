@@ -755,6 +755,7 @@ function createRpcClient(
   httpHeaders?: HttpHeaders,
   fetchMiddleware?: FetchMiddleware,
   disableRetryOnRateLimit?: boolean,
+  fetchFn?: typeof fetch,
 ): RpcClient {
   let agentManager: AgentManager | undefined;
   if (!process.env.BROWSER) {
@@ -778,7 +779,9 @@ function createRpcClient(
           }
         },
       );
-      return await fetch(...modifiedFetchArgs);
+      return fetchFn
+        ? await fetchFn(...modifiedFetchArgs)
+        : await fetch(...modifiedFetchArgs);
     };
   }
 
@@ -804,7 +807,9 @@ function createRpcClient(
         if (fetchWithMiddleware) {
           res = await fetchWithMiddleware(url, options);
         } else {
-          res = await fetch(url, options);
+          res = fetchFn
+            ? await fetchFn(url, options)
+            : await fetch(url, options);
         }
 
         if (res.status !== 429 /* Too many requests */) {
@@ -2008,12 +2013,15 @@ export type ConnectionConfig = {
   disableRetryOnRateLimit?: boolean;
   /** time to allow for the server to initially process a transaction (in milliseconds) */
   confirmTransactionInitialTimeout?: number;
+  /** custom fetch function */
+  customFetch?: typeof fetch;
 };
 
 /**
  * A connection to a fullnode JSON RPC endpoint
  */
 export class Connection {
+  /** @internal */ _fetch: typeof fetch = fetch;
   /** @internal */ _commitment?: Commitment;
   /** @internal */ _confirmTransactionInitialTimeout?: number;
   /** @internal */ _rpcEndpoint: string;
@@ -2100,6 +2108,7 @@ export class Connection {
       this._commitment = commitmentOrConfig;
     } else if (commitmentOrConfig) {
       this._commitment = commitmentOrConfig.commitment;
+      this._fetch = commitmentOrConfig.customFetch || fetch;
       this._confirmTransactionInitialTimeout =
         commitmentOrConfig.confirmTransactionInitialTimeout;
       wsEndpoint = commitmentOrConfig.wsEndpoint;
@@ -2117,6 +2126,7 @@ export class Connection {
       httpHeaders,
       fetchMiddleware,
       disableRetryOnRateLimit,
+      this._fetch,
     );
     this._rpcRequest = createRpcRequest(this._rpcClient);
     this._rpcBatchRequest = createRpcBatchRequest(this._rpcClient);
