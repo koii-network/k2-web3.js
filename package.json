@@ -1,6 +1,6 @@
 {
   "name": "@_koii/web3.js",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "KOII (K2) Javascript API",
   "keywords": [
     "api",
@@ -60,7 +60,6 @@
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "@ethersproject/sha2": "^5.5.0",
-    "@mongodb-js/zstd": "^1.2.0",
     "@solana/buffer-layout": "^3.0.0",
     "bn.js": "^5.0.0",
     "borsh": "^0.4.0",
